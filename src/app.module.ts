@@ -8,15 +8,16 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { CoreModule } from './core/core.module';
 import { ConfigService } from './config/config.service';
 import { ConfigModule } from './config/config.module';
-import { ModelsModule } from './models/models.module';
+// import { ModelsModule } from './models/models.module';
 import { TypeormConfigService } from './config/typeorm-config.service';
+import { CategoriesModule } from './controllers/category/categories.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({}),
+    TypeOrmModule.forRoot(),
     CoreModule,
     ConfigModule,
-    ModelsModule,
+    CategoriesModule,
   ],
   controllers: [AppController],
   providers: [
