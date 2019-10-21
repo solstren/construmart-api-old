@@ -1,4 +1,9 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
-@Module({})
-export class CoreModule {}
+@Module({
+  imports: [
+  ],
+  providers: [],
+})
+export class CoreModule { }
