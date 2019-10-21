@@ -14,8 +14,9 @@ async function bootstrap() {
     .setTitle(AppConstants.SWAGGER_DOC_TITLE)
     .setDescription(AppConstants.SWAGGER_DOC_DESCRIPTION)
     .setVersion(AppConstants.SWAGGER_API_VERSION)
-    .addTag(AppConstants.ADMIN_SWAGGER_TAG, AppConstants.ADMIN_SWAGGER_TAG_DESCRIPTION)
-    .setSchemes('http')
+    .addTag(AppConstants.SWAGGER_ADMIN_TAG, AppConstants.SWAGGER_ADMIN_TAG_DESCRIPTION)
+    .addTag(AppConstants.SWAGGER_CUSTOMER_TAG, AppConstants.SWAGGER_CUSTOMER_TAG_DESCRIPTION)
+    .setSchemes('http', 'https')
     .build();
   const swaggerDoc = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('', app, swaggerDoc);
