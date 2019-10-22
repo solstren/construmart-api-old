@@ -1,5 +1,5 @@
 import { AppConstants } from '../../utils/app-constants';
-import { Category } from '../../models/entities/category.entity';
+import { Category } from '../../entities/category.entity';
 import { Controller, Get, Param, ParseIntPipe, Post } from '@nestjs/common';
 import { CategoriesService } from './services/categories.service';
 import { ApiUseTags } from '@nestjs/swagger';
