@@ -1,11 +1,8 @@
 import { CategoryResponse } from './category-response';
-export class ProductResponse {
-
-    constructor(
-        public name: string,
-        public description: string,
-        public price: number,
-        public imageUrl: string,
-        public category: CategoryResponse,
-    ) {}
+export interface ProductResponse {
+    name: string;
+    description: string;
+    price: number;
+    imageUrl: string;
+    category: CategoryResponse; 
 }

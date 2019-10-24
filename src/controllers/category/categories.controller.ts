@@ -1,8 +1,10 @@
+import { BaseResponse } from './../../models/response-dto/base-response';
 import { AppConstants } from '../../utils/app-constants';
 import { Category } from '../../entities/category.entity';
-import { Controller, Get, Param, ParseIntPipe, Post } from '@nestjs/common';
+import { Controller, Get, Param, ParseIntPipe, Post, Body } from '@nestjs/common';
 import { CategoriesService } from './services/categories.service';
 import { ApiUseTags } from '@nestjs/swagger';
+import { CategoryRequest } from '../../models/request-dto/category-request';
 
 
 @Controller(`${AppConstants.APP_BASE_URL}categories`)
@@ -11,19 +13,19 @@ export class CategoriesController {
 
     @ApiUseTags(AppConstants.SWAGGER_ADMIN_TAG, AppConstants.SWAGGER_CUSTOMER_TAG)
     @Get('/:id')
-    async getById(@Param('id', ParseIntPipe) id: number): Promise<Category> {
+    async getCategoryById(@Param('id', ParseIntPipe) id: number): Promise<BaseResponse> {
         return this._categoryService.getCategoryById(id);
     }
 
     @ApiUseTags(AppConstants.SWAGGER_ADMIN_TAG, AppConstants.SWAGGER_CUSTOMER_TAG)
     @Get()
-    async getAll(): Promise<Category> {
+    async getAllCategories(): Promise<Category> {
         throw new Error('Not Implemented');
     }
 
     @ApiUseTags(AppConstants.SWAGGER_ADMIN_TAG)
     @Post()
-    async post(): Promise<Category> {
-        throw new Error('Not Implemented');
+    async postCategory(@Body() data: CategoryRequest): Promise<Category> {
+        this._categoryService.getAllCategories()
     }
 }

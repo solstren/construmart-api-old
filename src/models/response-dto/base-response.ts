@@ -1,8 +1,5 @@
-export class BaseResponse {
-
-    constructor(
-        public body: any,
-        public status: boolean,
-        public message: string,
-    ) { }
+export interface BaseResponse {
+    body: any;
+    status: boolean;
+    message: string;
 }

@@ -1,4 +1,5 @@
 import { PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, VersionColumn } from 'typeorm';
+import { Exclude } from 'class-transformer';
 
 export abstract class BaseEntity {
     @PrimaryGeneratedColumn({type: 'bigint', unsigned: true})
