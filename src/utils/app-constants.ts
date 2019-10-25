@@ -1,5 +1,5 @@
 export class AppConstants {
-    // env keys
+    // swagger constants
     static SWAGGER_DOC_TITLE = 'Construmart API';
     static SWAGGER_DOC_DESCRIPTION = 'Documentation for Construmart web service';
     static SWAGGER_API_VERSION = '1.0';
@@ -8,4 +8,12 @@ export class AppConstants {
     static SWAGGER_CUSTOMER_TAG = 'Construmart Customer';
     static SWAGGER_CUSTOMER_TAG_DESCRIPTION = 'These are documented endpoints for the customer role of the service';
     static APP_BASE_URL = 'api/v1/';
+    static SWAGGER_500_DESCRIPTION = 'Something went wrong internally...please contact support';
+    static SWAGGER_200_DESCRIPTION = 'Request completed sucessfully';
+    static SWAGGER_400_DESCRIPTION = 'Invalid request payload';
+    static SWAGGER_304_DESCRIPTION = 'Failed to update data';
+    static SWAGGER_404_DESCRIPTION = 'Data does not exist';
+
+    static ORDER_ASC = 'ASC';
+    static ORDER_DESC = 'DESC';
 }
