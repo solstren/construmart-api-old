@@ -6,10 +6,10 @@ export abstract class BaseEntity {
     id: number;
 
     @CreateDateColumn({name: 'date_created', type: 'timestamp'})
-    dateCreated: Date;
+    dateCreated?: Date;
 
     @UpdateDateColumn({name: 'date_updated', type: 'timestamp'})
-    dateUpdated: Date;
+    dateUpdated?: Date;
 
     @VersionColumn({name: 'row_version', type: 'int', unsigned: true})
     rowVersion: number;
