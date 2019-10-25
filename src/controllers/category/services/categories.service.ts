@@ -1,15 +1,11 @@
-import { AppConstants } from './../../../utils/app-constants';
-import { CategoryResponse } from './../../../models/response-dto/category-response';
+import { UpdateCategoryDto } from './../../../models/request-dto/update-category-dto';
 import { BaseResponse } from '../../../models/response-dto/base-response';
 import { Category } from '../../../entities/category.entity';
 import {
   Injectable,
   NotFoundException,
-  InternalServerErrorException,
   HttpException,
-  HttpService,
   HttpStatus,
-  Res,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CategoriesRepository } from '../repositories/categories.repository';
@@ -26,7 +22,6 @@ export class CategoriesService {
   async getCategoryById(id: number): Promise<BaseResponse> {
     const category: Category = await this._categoryRepo.findOne(id, {
       relations: ['products'],
-      order: { name: 'ASC' },
     });
     if (!category) {
       throw new NotFoundException(`Category with id "${id}" not found`);
@@ -39,18 +34,13 @@ export class CategoriesService {
   }
 
   async getAllCategories(): Promise<BaseResponse> {
-    let categoriesRes: Category[];
     let categories: Category[];
     try {
       categories = await this._categoryRepo.find({
         order: { name: 'ASC' },
       });
-    //   categories.forEach(category => {
-    //       const singleCategory: CategoryResponse = category;
-    //       categoriesRes.push();
-    //   });
     } catch (ex) {
-      const response: BaseResponse = {
+      const response = {
         body: null,
         status: false,
         message: 'An error occured',
@@ -85,7 +75,32 @@ export class CategoriesService {
     return {
       body: category,
       status: true,
-      message: ResponseMessages.SUCCESS,
+      message: ResponseMessages.CREATE_CATEGORY_SUCCESS,
+    };
+  }
+
+  async updateCategory(
+    request: Partial<UpdateCategoryDto>,
+    id: number,
+  ): Promise<BaseResponse> {
+    const category = await this._categoryRepo.findOne(id);
+    if (!category) {
+      throw new HttpException(
+        ResponseMessages.CATEGORY_DOES_NOT_EXIST,
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    // if (!request.rowVersion || request.rowVersion !== category.rowVersion) {
+    //   throw new HttpException(ResponseMessages.ERROR, HttpStatus.NOT_MODIFIED);
+    // }
+    const result = await this._categoryRepo.update({ id }, request);
+    if (!result) {
+      throw new HttpException(ResponseMessages.ERROR, HttpStatus.NOT_MODIFIED);
+    }
+    return {
+      body: null,
+      status: true,
+      message: ResponseMessages.UPDATE_CATEGORY_SUCCESS,
     };
   }
 }
