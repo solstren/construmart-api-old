@@ -18,7 +18,7 @@ async function bootstrap() {
     .setVersion(AppConstants.SWAGGER_API_VERSION)
     .addTag(AppConstants.SWAGGER_ADMIN_TAG, AppConstants.SWAGGER_ADMIN_TAG_DESCRIPTION)
     .addTag(AppConstants.SWAGGER_CUSTOMER_TAG, AppConstants.SWAGGER_CUSTOMER_TAG_DESCRIPTION)
-    .setSchemes('http', 'https')
+    .setSchemes('https', 'http')
     .build();
   const swaggerDoc = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('', app, swaggerDoc);
