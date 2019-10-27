@@ -13,7 +13,9 @@ import {
 	UsePipes,
 	UseFilters,
 	ValidationPipe,
-  UseInterceptors
+	UseInterceptors,
+	Delete,
+	NotImplementedException
 } from '@nestjs/common';
 import { CategoriesService } from './services/categories.service';
 import {
@@ -37,8 +39,6 @@ import { LoggerInterceptor } from '../../shared/logger.interceptor';
 export class CategoriesController {
 	constructor(private _categoryService: CategoriesService) {}
 
-	@ApiUseTags(AppConstants.SWAGGER_ADMIN_TAG, AppConstants.SWAGGER_CUSTOMER_TAG)
-	@Get('/:id')
 	@ApiOkResponse({
 		description: AppConstants.SWAGGER_200_DESCRIPTION,
 		type: BaseResponse
@@ -47,6 +47,7 @@ export class CategoriesController {
 		description: AppConstants.SWAGGER_404_DESCRIPTION,
 		type: BaseResponse
 	})
+	@Get('/:id')
 	async getCategoryById(
 		@Param('id', ParseIntPipe)
 		id: number
@@ -54,7 +55,14 @@ export class CategoriesController {
 		return await this._categoryService.getCategoryById(id);
 	}
 
-	@ApiUseTags(AppConstants.SWAGGER_ADMIN_TAG, AppConstants.SWAGGER_CUSTOMER_TAG)
+	@ApiOkResponse({
+		description: AppConstants.SWAGGER_200_DESCRIPTION,
+		type: BaseResponse
+	})
+	@ApiNotFoundResponse({
+		description: AppConstants.SWAGGER_404_DESCRIPTION,
+		type: BaseResponse
+	})
 	@Get()
 	async getAllCategories(): Promise<BaseResponse> {
 		return await this._categoryService.getAllCategories();
@@ -96,7 +104,58 @@ export class CategoriesController {
 		@Param('id', ParseIntPipe)
 		id: number,
 		@Body() request: UpdateCategoryDto
-	) {
+	): Promise<BaseResponse> {
 		return await this._categoryService.updateCategory(request, id);
+	}
+
+	@ApiUseTags(AppConstants.SWAGGER_ADMIN_TAG)
+	@ApiOkResponse({
+		description: AppConstants.SWAGGER_200_DESCRIPTION,
+		type: BaseResponse
+	})
+	@ApiNotFoundResponse({
+		description: AppConstants.SWAGGER_404_DESCRIPTION,
+		type: BaseResponse
+	})
+	@Delete('/:id')
+	async deleteCategory(
+		@Param('id', ParseIntPipe)
+		id: number
+	): Promise<BaseResponse> {
+		return await this._categoryService.deleteCategory(id);
+	}
+
+	@ApiOkResponse({
+		description: AppConstants.SWAGGER_200_DESCRIPTION,
+		type: BaseResponse
+	})
+	@ApiNotFoundResponse({
+		description: AppConstants.SWAGGER_404_DESCRIPTION,
+		type: BaseResponse
+	})
+	@Get('/:categoryId/products')
+	async getCategoryProducts(
+		@Param('categoryId', ParseIntPipe)
+		categoryId: number
+	) {
+		throw new NotImplementedException('this endpoint has not been implemented');
+	}
+
+	@ApiOkResponse({
+		description: AppConstants.SWAGGER_200_DESCRIPTION,
+		type: BaseResponse
+	})
+	@ApiNotFoundResponse({
+		description: AppConstants.SWAGGER_404_DESCRIPTION,
+		type: BaseResponse
+	})
+	@Get('/:categoryId/products/:productId')
+	async getCategoryProduct(
+		@Param('categoryId', ParseIntPipe)
+		categoryId: number,
+		@Param('productId', ParseIntPipe)
+		productId: number
+	) {
+		throw new NotImplementedException('this endpoint has not been implemented');
 	}
 }
