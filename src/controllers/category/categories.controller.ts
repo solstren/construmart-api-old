@@ -12,7 +12,8 @@ import {
 	Put,
 	UsePipes,
 	UseFilters,
-  ValidationPipe
+	ValidationPipe,
+  UseInterceptors
 } from '@nestjs/common';
 import { CategoriesService } from './services/categories.service';
 import {
@@ -27,8 +28,12 @@ import {
 import { CreateCategoryDto } from '../../models/request-dto/create-category-dto';
 import { AppValidationPipe } from '../../shared/app-validation.pipe';
 import { HttpErrorFilter } from '../../shared/http-error.filter';
+import { LoggerInterceptor } from '../../shared/logger.interceptor';
 
 @Controller(`${AppConstants.APP_BASE_URL}categories`)
+@UsePipes(AppValidationPipe)
+@UseFilters(HttpErrorFilter)
+@UseInterceptors(LoggerInterceptor)
 export class CategoriesController {
 	constructor(private _categoryService: CategoriesService) {}
 
@@ -42,7 +47,6 @@ export class CategoriesController {
 		description: AppConstants.SWAGGER_404_DESCRIPTION,
 		type: BaseResponse
 	})
-	@UseFilters(HttpErrorFilter)
 	async getCategoryById(
 		@Param('id', ParseIntPipe)
 		id: number
@@ -69,8 +73,6 @@ export class CategoriesController {
 		description: AppConstants.SWAGGER_500_DESCRIPTION
 	})
 	@Post()
-  @UsePipes(AppValidationPipe)
-  @UseFilters(HttpErrorFilter)
 	async postCategory(@Body() request: CreateCategoryDto): Promise<BaseResponse> {
 		return await this._categoryService.createCategory(request);
 	}
@@ -90,8 +92,6 @@ export class CategoriesController {
 		type: BaseResponse
 	})
 	@Put('/:id')
-	@UseFilters(HttpErrorFilter)
-	@UsePipes(AppValidationPipe)
 	async updateCategory(
 		@Param('id', ParseIntPipe)
 		id: number,
