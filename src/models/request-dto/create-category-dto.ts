@@ -11,6 +11,5 @@ export class CreateCategoryDto {
   readonly description?: string;
 
   @ApiModelProperty()
-  @IsNotEmpty()
   readonly imageUrl?: string;
 }
