@@ -4,6 +4,8 @@ import { AppModule } from './app.module';
 import { Logger } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { } from 'module';
+import { HttpErrorFilter } from './shared/http-error.filter';
+import { AppValidationPipe } from './shared/app-validation.pipe';
 
 async function bootstrap() {
   const port = process.env.PORT || 3000;
