@@ -10,6 +10,8 @@ import { ConfigService } from './config/config.service';
 import { ConfigModule } from './config/config.module';
 // import { ModelsModule } from './models/models.module';
 import { CategoriesModule } from './controllers/category/categories.module';
+import { ProductModule } from './controllers/product/products.module';
+import { ProductsController } from './controllers/product/products.controller';
 
 @Module({
   imports: [
@@ -17,6 +19,7 @@ import { CategoriesModule } from './controllers/category/categories.module';
     CoreModule,
     ConfigModule,
     CategoriesModule,
+    ProductModule,
   ],
   controllers: [AppController],
   providers: [
