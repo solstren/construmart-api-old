@@ -8,7 +8,7 @@ import {
 	HttpStatus,
 	InternalServerErrorException,
 	BadRequestException,
-  NotImplementedException
+	NotImplementedException
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CategoriesRepository } from '../repositories/categories.repository';
@@ -100,8 +100,4 @@ export class CategoriesService {
 			body: null
 		};
 	}
-
-	async getCategoryProducts(id: number): Promise<BaseResponse> {
-    throw new NotImplementedException();
-  }
 }
