@@ -15,7 +15,8 @@ import {
 	ValidationPipe,
 	UseInterceptors,
 	Delete,
-	NotImplementedException
+	NotImplementedException,
+	Logger
 } from '@nestjs/common';
 import { CategoriesService } from './services/categories.service';
 import {
@@ -138,7 +139,7 @@ export class CategoriesController {
 		@Param('categoryId', ParseIntPipe)
 		categoryId: number
 	) {
-		throw new NotImplementedException('this endpoint has not been implemented');
+		return this._categoryService.getProductsByCategory(categoryId);
 	}
 
 	@ApiOkResponse({
