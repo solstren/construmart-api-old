@@ -8,7 +8,7 @@ import {
 	HttpStatus,
 	InternalServerErrorException,
 	BadRequestException,
-  NotImplementedException
+	NotImplementedException
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CategoriesRepository } from '../repositories/categories.repository';
@@ -41,11 +41,23 @@ export class CategoriesService {
 			throw new InternalServerErrorException();
 		}
 		return {
-			body: categories,
+ 			body: categories,
 			status: true,
 			message: ResponseMessages.SUCCESS
 		};
 	}
+
+	async getProductsByCategory(categoryId: number): Promise<BaseResponse>
+    {
+		const category = await this._categoryRepo.findOne(categoryId, {relations: ['products']});
+		if(!category) throw new NotFoundException(ResponseMessages.CATEGORY_DOES_NOT_EXIST);
+		const products = category.products.sort();
+		return {
+			status: true,
+			message: ResponseMessages.SUCCESS,
+			body: products
+		}
+    }
 
 	async createCategory(categoryReq: CreateCategoryDto): Promise<BaseResponse> {
 		// check if category exists
@@ -100,8 +112,4 @@ export class CategoriesService {
 			body: null
 		};
 	}
-
-	async getCategoryProducts(id: number): Promise<BaseResponse> {
-    throw new NotImplementedException();
-  }
 }
