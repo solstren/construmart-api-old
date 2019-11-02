@@ -1,12 +1,13 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Param, Res } from '@nestjs/common';
 import { AppService } from './app.service';
+import { AppConstants } from './utils/app-constants';
 
-@Controller()
+@Controller(`${AppConstants.APP_BASE_URL}uploads`)
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
-  }
+  @Get(':filename')
+	async serveCategoryImage(@Param('filename') filename, @Res() res): Promise<any>{
+		res.sendFile(filename, {root: 'uploads'});
+	}
 }

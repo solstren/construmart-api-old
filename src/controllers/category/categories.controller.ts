@@ -16,7 +16,9 @@ import {
 	UseInterceptors,
 	Delete,
 	NotImplementedException,
-	Logger
+	Logger,
+	UploadedFile,
+	Res
 } from '@nestjs/common';
 import { CategoriesService } from './services/categories.service';
 import {
@@ -32,6 +34,14 @@ import { CreateCategoryDto } from '../../models/request-dto/create-category-dto'
 import { AppValidationPipe } from '../../shared/app-validation.pipe';
 import { HttpErrorFilter } from '../../shared/http-error.filter';
 import { LoggerInterceptor } from '../../shared/logger.interceptor';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import * as fs from 'fs';
+import { diskStorage } from 'multer';
+import {} from 'path';
+import { editFileName } from '../../utils/edit-filename';
+import { filter } from 'minimatch';
+import { imageFileFilter } from '../../utils/image-filter';
+import { FileUploadRequest } from '../../models/request-dto/file-upload-request';
 
 @Controller(`${AppConstants.APP_BASE_URL}categories`)
 @UsePipes(AppValidationPipe)
@@ -72,7 +82,7 @@ export class CategoriesController {
 	@ApiUseTags(AppConstants.SWAGGER_ADMIN_TAG)
 	@ApiCreatedResponse({
 		type: BaseResponse,
-		description: AppConstants.SWAGGER_200_DESCRIPTION
+		description: AppConstants.SWAGGER_201_DESCRIPTION
 	})
 	@ApiBadRequestResponse({
 		type: BaseResponse,
@@ -82,8 +92,14 @@ export class CategoriesController {
 		description: AppConstants.SWAGGER_500_DESCRIPTION
 	})
 	@Post()
-	async postCategory(@Body() request: CreateCategoryDto): Promise<BaseResponse> {
-		return await this._categoryService.createCategory(request);
+	@UseInterceptors(
+		FileInterceptor('categoryImage', {
+			storage: diskStorage({ filename: editFileName, destination: './uploads' }),
+			fileFilter: imageFileFilter
+		})
+	)
+	async postCategory(@UploadedFile() file: FileUploadRequest, @Body() request: CreateCategoryDto): Promise<any> {
+		return await this._categoryService.createCategory(request, file);
 	}
 
 	@ApiUseTags(AppConstants.SWAGGER_ADMIN_TAG)
@@ -157,6 +173,11 @@ export class CategoriesController {
 		@Param('productId', ParseIntPipe)
 		productId: number
 	) {
-		throw new NotImplementedException('this endpoint has not been implemented');
+		return this._categoryService.getProductByCategory(categoryId, productId);
+	}
+
+	@Get('/:filepath')
+	async serveCategoryImage(@Param('filename') filename, @Res() res): Promise<any>{
+		res.sendFile(filename, {root: 'uploads'});
 	}
 }

@@ -14,6 +14,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CategoriesRepository } from '../repositories/categories.repository';
 import { CreateCategoryDto } from '../../../models/request-dto/create-category-dto';
 import { ResponseMessages } from '../../../utils/response-messages';
+import { FileUploadRequest } from '../../../models/request-dto/file-upload-request';
 
 @Injectable()
 export class CategoriesService {
@@ -57,9 +58,21 @@ export class CategoriesService {
 			message: ResponseMessages.SUCCESS,
 			body: products
 		}
-    }
+	}
+	
+	async getProductByCategory(categoryId: number, productId: number): Promise<BaseResponse>{
+		const category = await this._categoryRepo.findOne(categoryId, {relations: ['products']});
+		if(!category) throw new NotFoundException(ResponseMessages.CATEGORY_DOES_NOT_EXIST);
+		const product = category.products.find((value, index, obj) => value.id === productId);
+		if(!product) throw new NotFoundException(ResponseMessages.PRODUCT_DOES_NOT_EXIST_IN_CATEGORY);
+		return {
+			status: true,
+			message: ResponseMessages.SUCCESS,
+			body: product
+		}
+	}
 
-	async createCategory(categoryReq: CreateCategoryDto): Promise<BaseResponse> {
+	async createCategory(categoryReq: CreateCategoryDto, file: FileUploadRequest): Promise<BaseResponse> {
 		// check if category exists
 		const duplicateCount = await this._categoryRepo.findAndCount({
 			where: { name: { value: categoryReq.name } }
@@ -70,7 +83,7 @@ export class CategoriesService {
 		}
 		const category = new Category();
 		category.name = categoryReq.name;
-		category.imageUrl = categoryReq.imageUrl;
+		category.imageName = file.filename || null;
 		category.description = categoryReq.description;
 
 		await this._categoryRepo.save(category);
