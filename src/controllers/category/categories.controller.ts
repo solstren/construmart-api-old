@@ -98,9 +98,7 @@ export class CategoriesController {
 			fileFilter: imageFileFilter
 		})
 	)
-	async postCategory(@UploadedFile() file: FileUploadRequest, @Body() request: CreateCategoryDto): Promise<any> { 
-		console.log(file);
-		console.log(request);
+	async postCategory(@UploadedFile() file: FileUploadRequest, @Body() request: CreateCategoryDto): Promise<any> {
 		return await this._categoryService.createCategory(request, file);
 	}
 
@@ -175,7 +173,7 @@ export class CategoriesController {
 		@Param('productId', ParseIntPipe)
 		productId: number
 	) {
-		throw new NotImplementedException('this endpoint has not been implemented');
+		return this._categoryService.getProductByCategory(categoryId, productId);
 	}
 
 	@Get('/:filepath')

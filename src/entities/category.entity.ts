@@ -12,8 +12,8 @@ export class Category extends BaseEntity{
     @Column({ type: 'text', nullable: true })
     description?: string;
 
-    @Column({ name: 'image_url', type: 'varchar', nullable: true })
-    imageUrl?: string;
+    @Column({ name: 'image_name', type: 'varchar', nullable: true })
+    imageName?: string;
 
     @OneToMany(type => Product, product => product.category)
     products: Product[];
