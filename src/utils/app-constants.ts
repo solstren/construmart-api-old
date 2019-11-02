@@ -10,6 +10,7 @@ export class AppConstants {
     static APP_BASE_URL = 'api/v1/';
     static SWAGGER_500_DESCRIPTION = 'Something went wrong internally...please contact support';
     static SWAGGER_200_DESCRIPTION = 'Request completed sucessfully';
+    static SWAGGER_201_DESCRIPTION = 'Created sucessfully';
     static SWAGGER_400_DESCRIPTION = 'Invalid request payload';
     static SWAGGER_304_DESCRIPTION = 'Failed to update data';
     static SWAGGER_404_DESCRIPTION = 'Data does not exist';

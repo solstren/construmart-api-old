@@ -14,6 +14,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CategoriesRepository } from '../repositories/categories.repository';
 import { CreateCategoryDto } from '../../../models/request-dto/create-category-dto';
 import { ResponseMessages } from '../../../utils/response-messages';
+import { FileUploadRequest } from '../../../models/request-dto/file-upload-request';
 
 @Injectable()
 export class CategoriesService {
@@ -59,7 +60,7 @@ export class CategoriesService {
 		}
     }
 
-	async createCategory(categoryReq: CreateCategoryDto): Promise<BaseResponse> {
+	async createCategory(categoryReq: CreateCategoryDto, file: FileUploadRequest): Promise<BaseResponse> {
 		// check if category exists
 		const duplicateCount = await this._categoryRepo.findAndCount({
 			where: { name: { value: categoryReq.name } }
@@ -70,7 +71,7 @@ export class CategoriesService {
 		}
 		const category = new Category();
 		category.name = categoryReq.name;
-		category.imageUrl = categoryReq.imageUrl;
+		category.imageUrl = file.filename;
 		category.description = categoryReq.description;
 
 		await this._categoryRepo.save(category);

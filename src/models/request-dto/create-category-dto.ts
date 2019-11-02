@@ -9,7 +9,4 @@ export class CreateCategoryDto {
 
   @ApiModelProperty()
   readonly description?: string;
-
-  @ApiModelProperty()
-  readonly imageUrl?: string;
 }

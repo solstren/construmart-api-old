@@ -1,6 +1,8 @@
 development.env
 production.env
 
+uploads
+
 # compiled output
 /dist
 /node_modules
