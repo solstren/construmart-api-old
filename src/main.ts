@@ -4,8 +4,7 @@ import { AppModule } from './app.module';
 import { Logger } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { } from 'module';
-import { HttpErrorFilter } from './shared/http-error.filter';
-import { AppValidationPipe } from './shared/app-validation.pipe';
+import * as compression from 'compression';
 
 async function bootstrap() {
   const port = process.env.PORT || 3000;
@@ -24,6 +23,7 @@ async function bootstrap() {
   SwaggerModule.setup('', app, swaggerDoc);
 
   app.enableCors();
+  app.use(compression())
   await app.listen(port);
   Logger.log(`App started at port => ${port}`);
 }

@@ -6,7 +6,7 @@ import { Module } from '@nestjs/common';
 import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { editFileName } from '../../utils/edit-filename';
-import { imageFileFilter } from '../../utils/image-filter';
+import { imageFileValidator } from '../../utils/image-validator';
 
 @Module({
 	controllers: [ CategoriesController ],
@@ -14,7 +14,7 @@ import { imageFileFilter } from '../../utils/image-filter';
 		TypeOrmModule.forFeature([ CategoriesRepository ]),
 		MulterModule.register({
 			storage: diskStorage({ filename: editFileName, destination: './uploads' }),
-			fileFilter: imageFileFilter
+			fileFilter: imageFileValidator
 		})
 	],
 	providers: [ CategoriesService ]

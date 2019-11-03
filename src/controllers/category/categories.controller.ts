@@ -25,7 +25,10 @@ import {
 	ApiBadRequestResponse,
 	ApiInternalServerErrorResponse,
 	ApiOkResponse,
-	ApiNotFoundResponse
+	ApiNotFoundResponse,
+	ApiUnprocessableEntityResponse,
+	ApiImplicitFile,
+	ApiConsumes
 } from '@nestjs/swagger';
 import { AppValidationPipe } from '../../shared/app-validation.pipe';
 import { HttpErrorFilter } from '../../shared/http-error.filter';
@@ -49,6 +52,9 @@ export class CategoriesController {
 		description: AppConstants.SWAGGER_404_DESCRIPTION,
 		type: BaseResponse
 	})
+	@ApiInternalServerErrorResponse({
+		description: AppConstants.SWAGGER_500_DESCRIPTION
+	})
 	@Get('/:id')
 	async getCategoryById(
 		@Param('id', ParseIntPipe)
@@ -65,6 +71,9 @@ export class CategoriesController {
 		description: AppConstants.SWAGGER_404_DESCRIPTION,
 		type: BaseResponse
 	})
+	@ApiInternalServerErrorResponse({
+		description: AppConstants.SWAGGER_500_DESCRIPTION
+	})
 	@Get()
 	async getAllCategories(): Promise<BaseResponse> {
 		return await this._categoryService.getAllCategories();
@@ -79,15 +88,19 @@ export class CategoriesController {
 		type: BaseResponse,
 		description: AppConstants.SWAGGER_400_DESCRIPTION
 	})
+	@ApiUnprocessableEntityResponse({
+		type: BaseResponse,
+		description: AppConstants.SWAGGER_422_DESCRIPTION
+	})
 	@ApiInternalServerErrorResponse({
 		description: AppConstants.SWAGGER_500_DESCRIPTION
 	})
+	@ApiConsumes('multipart/form-data')
+	@ApiImplicitFile({ name: 'imageFile', required: false, description: 'the image file for the category' })
 	@Post()
-	@UseInterceptors(FileInterceptor('categoryImage'))
+	@UseInterceptors(FileInterceptor('imageFile'))
 	async postCategory(@UploadedFile() file: FileUploadRequest, @Body() request: CategoryRequestDto): Promise<any> {
-		console.log(file);
-		console.log(request);
-		// return await this._categoryService.createCategory(request, file);
+		return await this._categoryService.createCategory(request, file);
 	}
 
 	@ApiUseTags(AppConstants.SWAGGER_ADMIN_TAG)
@@ -104,14 +117,20 @@ export class CategoriesController {
 		description: AppConstants.SWAGGER_404_DESCRIPTION,
 		type: BaseResponse
 	})
+	@ApiInternalServerErrorResponse({
+		description: AppConstants.SWAGGER_500_DESCRIPTION
+	})
+	@ApiConsumes('multipart/form-data')
+	@ApiImplicitFile({ name: 'imageFile', required: false, description: 'the image file for the category' })
 	@Put('/:id')
-	@UseInterceptors(FileInterceptor('categoryImage'))
+	@UseInterceptors(FileInterceptor('imageFile'))
 	async updateCategory(
 		@Param('id', ParseIntPipe)
 		id: number,
+		@UploadedFile() file: FileUploadRequest,
 		@Body() request: CategoryRequestDto
 	): Promise<BaseResponse> {
-		return await this._categoryService.updateCategory(request, id);
+		return await this._categoryService.updateCategory(id, file, request);
 	}
 
 	@ApiUseTags(AppConstants.SWAGGER_ADMIN_TAG)
@@ -122,6 +141,9 @@ export class CategoriesController {
 	@ApiNotFoundResponse({
 		description: AppConstants.SWAGGER_404_DESCRIPTION,
 		type: BaseResponse
+	})
+	@ApiInternalServerErrorResponse({
+		description: AppConstants.SWAGGER_500_DESCRIPTION
 	})
 	@Delete('/:id')
 	async deleteCategory(
@@ -140,6 +162,9 @@ export class CategoriesController {
 		type: BaseResponse
 	})
 	@Get('/:categoryId/products')
+	@ApiInternalServerErrorResponse({
+		description: AppConstants.SWAGGER_500_DESCRIPTION
+	})
 	async getCategoryProducts(
 		@Param('categoryId', ParseIntPipe)
 		categoryId: number
@@ -155,6 +180,9 @@ export class CategoriesController {
 		description: AppConstants.SWAGGER_404_DESCRIPTION,
 		type: BaseResponse
 	})
+	@ApiInternalServerErrorResponse({
+		description: AppConstants.SWAGGER_500_DESCRIPTION
+	})
 	@Get('/:categoryId/products/:productId')
 	async getCategoryProduct(
 		@Param('categoryId', ParseIntPipe)
@@ -163,10 +191,5 @@ export class CategoriesController {
 		productId: number
 	) {
 		return this._categoryService.getProductByCategory(categoryId, productId);
-	}
-
-	@Get('/:filepath')
-	async serveCategoryImage(@Param('filename') filename, @Res() res): Promise<any> {
-		res.sendFile(filename, { root: 'uploads' });
 	}
 }

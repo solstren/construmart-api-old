@@ -12,6 +12,7 @@ export class AppConstants {
     static SWAGGER_200_DESCRIPTION = 'Request completed sucessfully';
     static SWAGGER_201_DESCRIPTION = 'Created sucessfully';
     static SWAGGER_400_DESCRIPTION = 'Invalid request payload';
+    static SWAGGER_422_DESCRIPTION = 'An error occured while creating category';
     static SWAGGER_304_DESCRIPTION = 'Failed to update data';
     static SWAGGER_404_DESCRIPTION = 'Data does not exist';
 

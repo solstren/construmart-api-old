@@ -9,10 +9,15 @@ import { ResponseMessages } from '../../../utils/response-messages';
 export class ProductsService {
 	constructor(@InjectRepository(ProductsRepository) private readonly _productRepo: ProductsRepository) {}
 
-	getProductById(id: number): BaseResponse | PromiseLike<BaseResponse> {
-		const product = this._productRepo.findOne(id, { loadEagerRelations: true });
-		if (!product) {
-			throw new NotFoundException(`Product with id '${id}' not found`);
+	async getProductById(id: number): Promise<BaseResponse> {
+		let product: Product;
+		try {
+			product = await this._productRepo.findOne(id, { loadEagerRelations: true });
+			if (!product) {
+				throw new NotFoundException(`Product with id '${id}' not found`);
+			}
+		} catch (error) {
+			throw new InternalServerErrorException(ResponseMessages.ERROR);
 		}
 		return {
 			body: product,
@@ -29,7 +34,7 @@ export class ProductsService {
 				loadEagerRelations: true
 			});
 		} catch (ex) {
-			throw new InternalServerErrorException();
+			throw new InternalServerErrorException(ResponseMessages.ERROR);
 		}
 		return {
 			status: true,
@@ -39,15 +44,46 @@ export class ProductsService {
 	}
 
 	async deleteProduct(id: number): Promise<BaseResponse> {
-		const product = await this._productRepo.findOne(id);
-		if (!product) {
-			throw new NotFoundException(`Product with id ${id} not found`);
+		try {
+			const product = await this._productRepo.findOne(id);
+			if (!product) {
+				throw new NotFoundException(`Product with id ${id} not found`);
+			}
+			await this._productRepo.remove(product);
+		} catch (error) {
+			throw new InternalServerErrorException(ResponseMessages.ERROR);
 		}
-		await this._productRepo.remove(product);
 		return {
 			status: true,
 			message: ResponseMessages.SUCCESS,
 			body: null
 		};
 	}
+
+	// async createProduct(categoryReq: CategoryRequestDto, file: FileUploadRequest): Promise<BaseResponse> {
+	// 	let category: Category;
+	// 	try {
+	// 		// check if category exists
+	// 		const duplicateCount = await this._categoryRepo.findAndCount({
+	// 			where: { name: { value: categoryReq.name } }
+	// 		});
+
+	// 		if (duplicateCount[1] >= 1) {
+	// 			throw new UnprocessableEntityException(ResponseMessages.CATEGORY_EXISTS);
+	// 		}
+	// 		category = new Category();
+	// 		category.name = categoryReq.name;
+	// 		category.imageName = file.filename || null;
+	// 		category.description = categoryReq.description;
+
+	// 		await this._categoryRepo.save(category);
+	// 	} catch (error) {
+	// 		throw new InternalServerErrorException(ResponseMessages.ERROR);
+	// 	}
+	// 	return {
+	// 		body: category,
+	// 		status: true,
+	// 		message: ResponseMessages.CREATE_CATEGORY_SUCCESS
+	// 	};
+	// }
 }

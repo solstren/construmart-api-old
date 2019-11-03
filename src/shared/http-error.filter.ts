@@ -1,7 +1,8 @@
-import { ArgumentsHost, Catch, ExceptionFilter, HttpException, Logger } from '@nestjs/common';
+import { ArgumentsHost, Catch, ExceptionFilter, HttpException, Logger, HttpStatus } from '@nestjs/common';
 import { Response, Request } from 'express';
 import { BaseResponse } from '../models/response-dto/base-response';
 import { ResponseMessages } from '../utils/response-messages';
+import { stringLiteral } from '@babel/types';
 
 @Catch()
 export class HttpErrorFilter implements ExceptionFilter {
@@ -20,10 +21,24 @@ export class HttpErrorFilter implements ExceptionFilter {
 			message: exception.message.message || null
 		};
 
+		let errorMsg: string;
+
+		switch (status) {
+			case HttpStatus.BAD_REQUEST:
+				errorMsg = 'Invalid Request. Kindly send a valid request';
+				break;
+			case HttpStatus.NOT_MODIFIED:
+				errorMsg = 'Failed to update data. Please try again';
+				break;
+			default:
+				errorMsg = ResponseMessages.ERROR;
+				break;
+		}
+
 		Logger.error(`${request.method} ==> ${request.url}`, JSON.stringify(errorObj), HttpErrorFilter.name);
 		const errorResponse: BaseResponse = {
 			status: false,
-			message: ResponseMessages.ERROR,
+			message: errorMsg,
 			body: errorObj
 		};
 		response.status(status).json(errorResponse);
