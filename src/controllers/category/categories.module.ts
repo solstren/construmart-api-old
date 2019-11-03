@@ -6,16 +6,15 @@ import { Module } from '@nestjs/common';
 import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { editFileName } from '../../utils/edit-filename';
-import { imageFileFilter } from '../../utils/image-filter';
+import { imageFileValidator } from '../../utils/image-validator';
 
 @Module({
 	controllers: [ CategoriesController ],
 	imports: [
 		TypeOrmModule.forFeature([ CategoriesRepository ]),
 		MulterModule.register({
-            dest: './uploads',
-            storage: diskStorage({ filename: editFileName }),
-			fileFilter: imageFileFilter
+			storage: diskStorage({ filename: editFileName, destination: './uploads' }),
+			fileFilter: imageFileValidator
 		})
 	],
 	providers: [ CategoriesService ]

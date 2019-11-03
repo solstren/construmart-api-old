@@ -1,4 +1,4 @@
-import { UpdateCategoryDto } from './../../models/request-dto/update-category-dto';
+import { CategoryRequestDto } from '../../models/request-dto/category-request-dto';
 import { BaseResponse } from './../../models/response-dto/base-response';
 import { AppConstants } from '../../utils/app-constants';
 import {
@@ -12,11 +12,8 @@ import {
 	Put,
 	UsePipes,
 	UseFilters,
-	ValidationPipe,
 	UseInterceptors,
 	Delete,
-	NotImplementedException,
-	Logger,
 	UploadedFile,
 	Res
 } from '@nestjs/common';
@@ -28,19 +25,16 @@ import {
 	ApiBadRequestResponse,
 	ApiInternalServerErrorResponse,
 	ApiOkResponse,
-	ApiNotFoundResponse
+	ApiNotFoundResponse,
+	ApiUnprocessableEntityResponse,
+	ApiImplicitFile,
+	ApiConsumes
 } from '@nestjs/swagger';
-import { CreateCategoryDto } from '../../models/request-dto/create-category-dto';
 import { AppValidationPipe } from '../../shared/app-validation.pipe';
 import { HttpErrorFilter } from '../../shared/http-error.filter';
 import { LoggerInterceptor } from '../../shared/logger.interceptor';
-import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
-import * as fs from 'fs';
-import { diskStorage } from 'multer';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {} from 'path';
-import { editFileName } from '../../utils/edit-filename';
-import { filter } from 'minimatch';
-import { imageFileFilter } from '../../utils/image-filter';
 import { FileUploadRequest } from '../../models/request-dto/file-upload-request';
 
 @Controller(`${AppConstants.APP_BASE_URL}categories`)
@@ -58,6 +52,9 @@ export class CategoriesController {
 		description: AppConstants.SWAGGER_404_DESCRIPTION,
 		type: BaseResponse
 	})
+	@ApiInternalServerErrorResponse({
+		description: AppConstants.SWAGGER_500_DESCRIPTION
+	})
 	@Get('/:id')
 	async getCategoryById(
 		@Param('id', ParseIntPipe)
@@ -74,6 +71,9 @@ export class CategoriesController {
 		description: AppConstants.SWAGGER_404_DESCRIPTION,
 		type: BaseResponse
 	})
+	@ApiInternalServerErrorResponse({
+		description: AppConstants.SWAGGER_500_DESCRIPTION
+	})
 	@Get()
 	async getAllCategories(): Promise<BaseResponse> {
 		return await this._categoryService.getAllCategories();
@@ -88,17 +88,18 @@ export class CategoriesController {
 		type: BaseResponse,
 		description: AppConstants.SWAGGER_400_DESCRIPTION
 	})
+	@ApiUnprocessableEntityResponse({
+		type: BaseResponse,
+		description: AppConstants.SWAGGER_422_DESCRIPTION
+	})
 	@ApiInternalServerErrorResponse({
 		description: AppConstants.SWAGGER_500_DESCRIPTION
 	})
+	@ApiConsumes('multipart/form-data')
+	@ApiImplicitFile({ name: 'imageFile', required: false, description: 'the image file for the category' })
 	@Post()
-	@UseInterceptors(
-		FileInterceptor('categoryImage', {
-			storage: diskStorage({ filename: editFileName, destination: './uploads' }),
-			fileFilter: imageFileFilter
-		})
-	)
-	async postCategory(@UploadedFile() file: FileUploadRequest, @Body() request: CreateCategoryDto): Promise<any> {
+	@UseInterceptors(FileInterceptor('imageFile'))
+	async postCategory(@UploadedFile() file: FileUploadRequest, @Body() request: CategoryRequestDto): Promise<any> {
 		return await this._categoryService.createCategory(request, file);
 	}
 
@@ -116,13 +117,20 @@ export class CategoriesController {
 		description: AppConstants.SWAGGER_404_DESCRIPTION,
 		type: BaseResponse
 	})
+	@ApiInternalServerErrorResponse({
+		description: AppConstants.SWAGGER_500_DESCRIPTION
+	})
+	@ApiConsumes('multipart/form-data')
+	@ApiImplicitFile({ name: 'imageFile', required: false, description: 'the image file for the category' })
 	@Put('/:id')
+	@UseInterceptors(FileInterceptor('imageFile'))
 	async updateCategory(
 		@Param('id', ParseIntPipe)
 		id: number,
-		@Body() request: UpdateCategoryDto
+		@UploadedFile() file: FileUploadRequest,
+		@Body() request: CategoryRequestDto
 	): Promise<BaseResponse> {
-		return await this._categoryService.updateCategory(request, id);
+		return await this._categoryService.updateCategory(id, file, request);
 	}
 
 	@ApiUseTags(AppConstants.SWAGGER_ADMIN_TAG)
@@ -133,6 +141,9 @@ export class CategoriesController {
 	@ApiNotFoundResponse({
 		description: AppConstants.SWAGGER_404_DESCRIPTION,
 		type: BaseResponse
+	})
+	@ApiInternalServerErrorResponse({
+		description: AppConstants.SWAGGER_500_DESCRIPTION
 	})
 	@Delete('/:id')
 	async deleteCategory(
@@ -151,6 +162,9 @@ export class CategoriesController {
 		type: BaseResponse
 	})
 	@Get('/:categoryId/products')
+	@ApiInternalServerErrorResponse({
+		description: AppConstants.SWAGGER_500_DESCRIPTION
+	})
 	async getCategoryProducts(
 		@Param('categoryId', ParseIntPipe)
 		categoryId: number
@@ -166,6 +180,9 @@ export class CategoriesController {
 		description: AppConstants.SWAGGER_404_DESCRIPTION,
 		type: BaseResponse
 	})
+	@ApiInternalServerErrorResponse({
+		description: AppConstants.SWAGGER_500_DESCRIPTION
+	})
 	@Get('/:categoryId/products/:productId')
 	async getCategoryProduct(
 		@Param('categoryId', ParseIntPipe)
@@ -174,10 +191,5 @@ export class CategoriesController {
 		productId: number
 	) {
 		return this._categoryService.getProductByCategory(categoryId, productId);
-	}
-
-	@Get('/:filepath')
-	async serveCategoryImage(@Param('filename') filename, @Res() res): Promise<any>{
-		res.sendFile(filename, {root: 'uploads'});
 	}
 }
