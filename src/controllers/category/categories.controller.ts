@@ -1,4 +1,4 @@
-import { UpdateCategoryDto } from './../../models/request-dto/update-category-dto';
+import { CategoryRequestDto } from '../../models/request-dto/category-request-dto';
 import { BaseResponse } from './../../models/response-dto/base-response';
 import { AppConstants } from '../../utils/app-constants';
 import {
@@ -12,11 +12,8 @@ import {
 	Put,
 	UsePipes,
 	UseFilters,
-	ValidationPipe,
 	UseInterceptors,
 	Delete,
-	NotImplementedException,
-	Logger,
 	UploadedFile,
 	Res
 } from '@nestjs/common';
@@ -30,17 +27,11 @@ import {
 	ApiOkResponse,
 	ApiNotFoundResponse
 } from '@nestjs/swagger';
-import { CreateCategoryDto } from '../../models/request-dto/create-category-dto';
 import { AppValidationPipe } from '../../shared/app-validation.pipe';
 import { HttpErrorFilter } from '../../shared/http-error.filter';
 import { LoggerInterceptor } from '../../shared/logger.interceptor';
-import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
-import * as fs from 'fs';
-import { diskStorage } from 'multer';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {} from 'path';
-import { editFileName } from '../../utils/edit-filename';
-import { filter } from 'minimatch';
-import { imageFileFilter } from '../../utils/image-filter';
 import { FileUploadRequest } from '../../models/request-dto/file-upload-request';
 
 @Controller(`${AppConstants.APP_BASE_URL}categories`)
@@ -92,14 +83,11 @@ export class CategoriesController {
 		description: AppConstants.SWAGGER_500_DESCRIPTION
 	})
 	@Post()
-	@UseInterceptors(
-		FileInterceptor('categoryImage', {
-			storage: diskStorage({ filename: editFileName, destination: './uploads' }),
-			fileFilter: imageFileFilter
-		})
-	)
-	async postCategory(@UploadedFile() file: FileUploadRequest, @Body() request: CreateCategoryDto): Promise<any> {
-		return await this._categoryService.createCategory(request, file);
+	@UseInterceptors(FileInterceptor('categoryImage'))
+	async postCategory(@UploadedFile() file: FileUploadRequest, @Body() request: CategoryRequestDto): Promise<any> {
+		console.log(file);
+		console.log(request);
+		// return await this._categoryService.createCategory(request, file);
 	}
 
 	@ApiUseTags(AppConstants.SWAGGER_ADMIN_TAG)
@@ -117,10 +105,11 @@ export class CategoriesController {
 		type: BaseResponse
 	})
 	@Put('/:id')
+	@UseInterceptors(FileInterceptor('categoryImage'))
 	async updateCategory(
 		@Param('id', ParseIntPipe)
 		id: number,
-		@Body() request: UpdateCategoryDto
+		@Body() request: CategoryRequestDto
 	): Promise<BaseResponse> {
 		return await this._categoryService.updateCategory(request, id);
 	}
@@ -177,7 +166,7 @@ export class CategoriesController {
 	}
 
 	@Get('/:filepath')
-	async serveCategoryImage(@Param('filename') filename, @Res() res): Promise<any>{
-		res.sendFile(filename, {root: 'uploads'});
+	async serveCategoryImage(@Param('filename') filename, @Res() res): Promise<any> {
+		res.sendFile(filename, { root: 'uploads' });
 	}
 }

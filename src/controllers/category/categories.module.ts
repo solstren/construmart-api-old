@@ -13,8 +13,7 @@ import { imageFileFilter } from '../../utils/image-filter';
 	imports: [
 		TypeOrmModule.forFeature([ CategoriesRepository ]),
 		MulterModule.register({
-            dest: './uploads',
-            storage: diskStorage({ filename: editFileName }),
+			storage: diskStorage({ filename: editFileName, destination: './uploads' }),
 			fileFilter: imageFileFilter
 		})
 	],

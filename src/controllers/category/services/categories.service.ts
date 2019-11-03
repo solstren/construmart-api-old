@@ -1,4 +1,4 @@
-import { UpdateCategoryDto } from './../../../models/request-dto/update-category-dto';
+import { CategoryRequestDto } from '../../../models/request-dto/category-request-dto';
 import { BaseResponse } from '../../../models/response-dto/base-response';
 import { Category } from '../../../entities/category.entity';
 import {
@@ -12,7 +12,6 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CategoriesRepository } from '../repositories/categories.repository';
-import { CreateCategoryDto } from '../../../models/request-dto/create-category-dto';
 import { ResponseMessages } from '../../../utils/response-messages';
 import { FileUploadRequest } from '../../../models/request-dto/file-upload-request';
 
@@ -42,37 +41,36 @@ export class CategoriesService {
 			throw new InternalServerErrorException();
 		}
 		return {
- 			body: categories,
+			body: categories,
 			status: true,
 			message: ResponseMessages.SUCCESS
 		};
 	}
 
-	async getProductsByCategory(categoryId: number): Promise<BaseResponse>
-    {
-		const category = await this._categoryRepo.findOne(categoryId, {relations: ['products']});
-		if(!category) throw new NotFoundException(ResponseMessages.CATEGORY_DOES_NOT_EXIST);
+	async getProductsByCategory(categoryId: number): Promise<BaseResponse> {
+		const category = await this._categoryRepo.findOne(categoryId, { relations: [ 'products' ] });
+		if (!category) throw new NotFoundException(ResponseMessages.CATEGORY_DOES_NOT_EXIST);
 		const products = category.products.sort();
 		return {
 			status: true,
 			message: ResponseMessages.SUCCESS,
 			body: products
-		}
+		};
 	}
-	
-	async getProductByCategory(categoryId: number, productId: number): Promise<BaseResponse>{
-		const category = await this._categoryRepo.findOne(categoryId, {relations: ['products']});
-		if(!category) throw new NotFoundException(ResponseMessages.CATEGORY_DOES_NOT_EXIST);
+
+	async getProductByCategory(categoryId: number, productId: number): Promise<BaseResponse> {
+		const category = await this._categoryRepo.findOne(categoryId, { relations: [ 'products' ] });
+		if (!category) throw new NotFoundException(ResponseMessages.CATEGORY_DOES_NOT_EXIST);
 		const product = category.products.find((value, index, obj) => value.id === productId);
-		if(!product) throw new NotFoundException(ResponseMessages.PRODUCT_DOES_NOT_EXIST_IN_CATEGORY);
+		if (!product) throw new NotFoundException(ResponseMessages.PRODUCT_DOES_NOT_EXIST_IN_CATEGORY);
 		return {
 			status: true,
 			message: ResponseMessages.SUCCESS,
 			body: product
-		}
+		};
 	}
 
-	async createCategory(categoryReq: CreateCategoryDto, file: FileUploadRequest): Promise<BaseResponse> {
+	async createCategory(categoryReq: CategoryRequestDto, file: FileUploadRequest): Promise<BaseResponse> {
 		// check if category exists
 		const duplicateCount = await this._categoryRepo.findAndCount({
 			where: { name: { value: categoryReq.name } }
@@ -94,7 +92,7 @@ export class CategoriesService {
 		};
 	}
 
-	async updateCategory(request: Partial<UpdateCategoryDto>, id: number): Promise<BaseResponse> {
+	async updateCategory(request: Partial<CategoryRequestDto>, id: number): Promise<BaseResponse> {
 		const category = await this._categoryRepo.findOne(id);
 		if (!category) {
 			throw new NotFoundException(ResponseMessages.CATEGORY_DOES_NOT_EXIST);
