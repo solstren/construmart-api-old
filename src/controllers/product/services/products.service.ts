@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, NotFoundException, InternalServerErrorException, UnprocessableEntityException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from '../../../entities/product.entity';
 import { ProductsRepository } from '../repositories/products.repository';
@@ -60,25 +60,24 @@ export class ProductsService {
 		};
 	}
 
-	// async createProduct(categoryReq: CategoryRequestDto, file: FileUploadRequest): Promise<BaseResponse> {
+	// async createProduct(productReq: CategoryRequestDto, file: FileUploadRequest): Promise<BaseResponse> {
 	// 	let category: Category;
-	// 	try {
-	// 		// check if category exists
-	// 		const duplicateCount = await this._categoryRepo.findAndCount({
-	// 			where: { name: { value: categoryReq.name } }
-	// 		});
+	// 	// check if category exists
+	// 	const duplicateCount = await this._categoryRepo.findAndCount({
+	// 		where: { name: { value: categoryReq.name } }
+	// 	});
 
-	// 		if (duplicateCount[1] >= 1) {
-	// 			throw new UnprocessableEntityException(ResponseMessages.CATEGORY_EXISTS);
-	// 		}
-	// 		category = new Category();
-	// 		category.name = categoryReq.name;
-	// 		category.imageName = file.filename || null;
-	// 		category.description = categoryReq.description;
+	// 	if (duplicateCount[1] >= 1) {
+	// 		throw new UnprocessableEntityException(ResponseMessages.CATEGORY_EXISTS);
+	// 	}
+	// 	category = new Category();
+	// 	category.name = categoryReq.name;
+	// 	category.imageName = file.filename || null;
+	// 	category.description = categoryReq.description;
 
-	// 		await this._categoryRepo.save(category);
-	// 	} catch (error) {
-	// 		throw new InternalServerErrorException(ResponseMessages.ERROR);
+	// 	await this._categoryRepo.save(category);
+	// 	if (category.id <= 0) {
+	// 		throw new UnprocessableEntityException('Failed to create category');
 	// 	}
 	// 	return {
 	// 		body: category,
