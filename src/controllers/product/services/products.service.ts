@@ -26,7 +26,7 @@ export class ProductsService {
 	async getProductById(id: number): Promise<BaseResponse> {
 		let product: Product;
 		try {
-			product = await this._productRepo.findOne(id, { loadEagerRelations: true });
+			product = await this._productRepo.findOne(id, { loadEagerRelations: true, relations: [ 'category' ] });
 			if (!product) {
 				throw new NotFoundException(`Product with id '${id}' not found`);
 			}
@@ -45,7 +45,8 @@ export class ProductsService {
 		try {
 			products = await this._productRepo.find({
 				order: { name: 'ASC' },
-				loadEagerRelations: true
+				loadEagerRelations: true,
+				relations: [ 'category' ]
 			});
 		} catch (ex) {
 			throw new InternalServerErrorException(ResponseMessages.ERROR);
