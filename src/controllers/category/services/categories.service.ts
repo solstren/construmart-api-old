@@ -46,9 +46,9 @@ export class CategoriesService {
 			loadRelationIds: { relations: [ 'products' ] }
 		});
 		return {
-			body: categories,
 			status: true,
-			message: ResponseMessages.SUCCESS
+			message: ResponseMessages.SUCCESS,
+			body: categories,
 		};
 	}
 
@@ -97,9 +97,9 @@ export class CategoriesService {
 			throw new UnprocessableEntityException('Failed to create category');
 		}
 		return {
-			body: category,
 			status: true,
-			message: ResponseMessages.CREATE_CATEGORY_SUCCESS
+			message: ResponseMessages.CREATE_CATEGORY_SUCCESS,
+			body: category,
 		};
 	}
 
@@ -121,9 +121,9 @@ export class CategoriesService {
 			throw new HttpException(ResponseMessages.ERROR, HttpStatus.NOT_MODIFIED);
 		}
 		return {
-			body: null,
 			status: true,
-			message: ResponseMessages.UPDATE_CATEGORY_SUCCESS
+			message: ResponseMessages.UPDATE_CATEGORY_SUCCESS,
+			body: null,
 		};
 	}
 

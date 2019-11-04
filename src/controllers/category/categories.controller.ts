@@ -121,7 +121,7 @@ export class CategoriesController {
 	@ApiInternalServerErrorResponse({
 		description: AppConstants.SWAGGER_500_DESCRIPTION
 	})
-	@ApiImplicitBody({name: 'create-category-dto', type: CategoryRequestDto, required: true})
+	@ApiImplicitBody({name: 'category-request-dto', type: CategoryRequestDto, required: true})
 	@ApiConsumes('multipart/form-data')
 	@ApiImplicitFile({ name: 'imageFile', required: false, description: 'the image file for the category' })
 	@Put('/:id')
