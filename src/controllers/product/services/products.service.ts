@@ -46,7 +46,7 @@ export class ProductsService {
 			products = await this._productRepo.find({
 				order: { name: 'ASC' },
 				loadEagerRelations: true,
-				relations: [ 'category' ]
+				loadRelationIds: true
 			});
 		} catch (ex) {
 			throw new InternalServerErrorException(ResponseMessages.ERROR);

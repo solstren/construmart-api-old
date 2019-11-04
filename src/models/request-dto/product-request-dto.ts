@@ -3,7 +3,7 @@ import { IsDefined, IsNotEmpty, IsCurrency, IsString, IsNumber } from 'class-val
 import { isDeclareTypeAlias } from '@babel/types';
 
 export class ProductRequestDto {
-	@ApiModelProperty({ type: String, required: true, nullable: false })
+	@ApiModelProperty({ required: true, type: String, nullable: false })
 	@IsNotEmpty()
 	@IsDefined()
 	name: string;
@@ -12,7 +12,7 @@ export class ProductRequestDto {
 	description: string;
 
 	@IsCurrency({ allow_decimal: true, thousands_separator: ',', decimal_separator: ',' })
-	@ApiModelProperty({ type: Number, required: false, description: 'the image file to be sent via form-data' })
+	@ApiModelProperty({ required: false, type: Number, description: 'the image file to be sent via form-data' })
 	price: number;
 
 	@ApiModelProperty({ required: false, description: 'the image file to be sent via form-data' })
@@ -21,7 +21,8 @@ export class ProductRequestDto {
 	@ApiModelProperty({ required: false, nullable: true, description: 'The name of the image file with extension' })
 	imageFileName?: string;
 
-	@IsNumber()
-	@ApiModelProperty({ type: Number, required: true, description: 'the id of the category the product belongs to' })
+	@IsDefined()
+	@IsNotEmpty()
+	@ApiModelProperty({ required: true, type: Number, description: 'the id of the category the product belongs to' })
 	categoryId: number;
 }

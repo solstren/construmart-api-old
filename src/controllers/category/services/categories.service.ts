@@ -27,7 +27,7 @@ export class CategoriesService {
 
 	async getCategoryById(id: number): Promise<BaseResponse> {
 		let category: Category;
-		category = await this._categoryRepo.findOne(id, { relations: [ 'products' ] });
+		category = await this._categoryRepo.findOne(id, {loadRelationIds: true});
 		console.log(`category => ${category}`);
 		if (!category) {
 			throw new NotFoundException(`Category with id '${id}' not found`);
@@ -43,7 +43,7 @@ export class CategoriesService {
 		let categories: Category[];
 		categories = await this._categoryRepo.find({
 			order: { name: 'ASC' },
-			loadRelationIds: { relations: [ 'products' ] }
+			loadRelationIds: true
 		});
 		return {
 			status: true,
