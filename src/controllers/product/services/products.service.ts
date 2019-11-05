@@ -26,7 +26,7 @@ export class ProductsService {
 	async getProductById(id: number): Promise<BaseResponse> {
 		let product: Product;
 		try {
-			product = await this._productRepo.findOne(id, { loadEagerRelations: true, relations: [ 'category' ] });
+			product = await this._productRepo.findOne(id, { loadEagerRelations: true, loadRelationIds: true});
 			if (!product) {
 				throw new NotFoundException(`Product with id '${id}' not found`);
 			}
@@ -91,13 +91,15 @@ export class ProductsService {
 		product.price = productReq.price;
 		product.category = category;
 		await this._productRepo.save(product);
+
+		const createdProduct: Product = await this._productRepo.findOne(product.id, { loadEagerRelations: true, loadRelationIds: true});
 		if (product.id <= 0) {
 			throw new UnprocessableEntityException('Failed to create category');
 		}
 		return {
 			status: true,
 			message: ResponseMessages.CREATE_PRODUCT_SUCCESS,
-			body: product
+			body: createdProduct
 		};
 	}
 

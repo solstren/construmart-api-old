@@ -67,8 +67,10 @@ export class CategoriesService {
 	async getProductByCategory(categoryId: number, productId: number): Promise<BaseResponse> {
 		let product: Product;
 		const category = await this._categoryRepo.findOne(categoryId, { relations: [ 'products' ] });
+		console.log(`category => ${category}`);
 		if (!category) throw new NotFoundException(ResponseMessages.CATEGORY_DOES_NOT_EXIST);
-		product = category.products.find((value, index, obj) => value.id === productId);
+		product = category.products.find((value, index, obj) => value.id == productId);
+		console.log(`product ==> ${product}`);
 		if (!product) throw new NotFoundException(ResponseMessages.PRODUCT_DOES_NOT_EXIST_IN_CATEGORY);
 		return {
 			status: true,
