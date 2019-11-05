@@ -26,7 +26,7 @@ export class ProductsService {
 	async getProductById(id: number): Promise<BaseResponse> {
 		let product: Product;
 		try {
-			product = await this._productRepo.findOne(id, { loadEagerRelations: true, loadRelationIds: true});
+			product = await this._productRepo.findOne(id, { loadEagerRelations: true, loadRelationIds: true });
 			if (!product) {
 				throw new NotFoundException(`Product with id '${id}' not found`);
 			}
@@ -92,7 +92,10 @@ export class ProductsService {
 		product.category = category;
 		await this._productRepo.save(product);
 
-		const createdProduct: Product = await this._productRepo.findOne(product.id, { loadEagerRelations: true, loadRelationIds: true});
+		const createdProduct: Product = await this._productRepo.findOne(product.id, {
+			loadEagerRelations: true,
+			loadRelationIds: true
+		});
 		if (product.id <= 0) {
 			throw new UnprocessableEntityException('Failed to create category');
 		}
@@ -117,7 +120,7 @@ export class ProductsService {
 		// if (!request.rowVersion || request.rowVersion !== category.rowVersion) {
 		//   throw new HttpException(ResponseMessages.ERROR, HttpStatus.NOT_MODIFIED);
 		// }
-		request.imageFileName = file.filename;
+		if (file) request.imageFileName = file.filename;
 		const result: UpdateResult = await this._productRepo.update({ id }, request);
 		if (!result || result.affected <= 0) {
 			throw new HttpException(ResponseMessages.ERROR, HttpStatus.NOT_MODIFIED);

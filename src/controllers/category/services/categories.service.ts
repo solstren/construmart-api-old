@@ -111,6 +111,7 @@ export class CategoriesService {
 		request: Partial<CategoryRequestDto>
 	): Promise<BaseResponse> {
 		const category = await this._categoryRepo.findOne(id);
+		console.log(category)
 		if (!category) {
 			throw new NotFoundException(ResponseMessages.CATEGORY_DOES_NOT_EXIST);
 		}

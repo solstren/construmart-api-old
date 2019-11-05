@@ -115,7 +115,7 @@ export class ProductsController {
 	@ApiInternalServerErrorResponse({
 		description: AppConstants.SWAGGER_500_DESCRIPTION
 	})
-	@ApiImplicitBody({ name: 'product-request-dto', type: ProductRequestDto, required: true })
+	// @ApiImplicitBody({ name: 'product-request-dto', type: ProductRequestDto, required: true })
 	@ApiConsumes('multipart/form-data')
 	@ApiImplicitFile({ name: 'imageFile', required: false, description: 'the image file for the product' })
 	@Put('/:id')
