@@ -3,7 +3,7 @@ import { IsNotEmpty, IsDefined } from 'class-validator';
 import { File } from '@babel/types';
 
 export class CategoryRequestDto {
-	@ApiModelProperty({ type: String, required: true, nullable: false, uniqueItems: true })
+	@ApiModelProperty({ type: String, required: true, nullable: false })
 	@IsNotEmpty()
 	@IsDefined()
 	readonly name: string;

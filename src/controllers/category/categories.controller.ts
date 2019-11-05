@@ -28,7 +28,8 @@ import {
 	ApiNotFoundResponse,
 	ApiUnprocessableEntityResponse,
 	ApiImplicitFile,
-	ApiConsumes
+	ApiConsumes,
+	ApiImplicitBody
 } from '@nestjs/swagger';
 import { AppValidationPipe } from '../../shared/app-validation.pipe';
 import { HttpErrorFilter } from '../../shared/http-error.filter';
@@ -120,6 +121,7 @@ export class CategoriesController {
 	@ApiInternalServerErrorResponse({
 		description: AppConstants.SWAGGER_500_DESCRIPTION
 	})
+	// @ApiImplicitBody({name: 'category-request-dto', type: CategoryRequestDto, required: true})
 	@ApiConsumes('multipart/form-data')
 	@ApiImplicitFile({ name: 'imageFile', required: false, description: 'the image file for the category' })
 	@Put('/:id')
