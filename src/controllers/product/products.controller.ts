@@ -37,7 +37,7 @@ import { ProductRequestDto } from '../../models/request-dto/product-request-dto'
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FileUploadRequest } from '../../models/request-dto/file-upload-request';
 
-@Controller('products')
+@Controller(`${AppConstants.APP_BASE_URL}products`)
 @UsePipes(AppValidationPipe)
 @UseFilters(HttpErrorFilter)
 @UseInterceptors(LoggerInterceptor)
