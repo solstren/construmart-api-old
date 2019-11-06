@@ -29,18 +29,20 @@ export class ProductsService {
 
 	async getProductById(id: number): Promise<BaseResponse> {
 		let product: Product;
+		let productResponse: ProductResponse;
 		try {
-			product = await this._productRepo.findOne(id, { loadEagerRelations: true, loadRelationIds: true });
+			product = await this._productRepo.findOne(id, { loadEagerRelations: true, relations: ['category'] });
 			if (!product) {
 				throw new NotFoundException(`Product with id '${id}' not found`);
 			}
+			productResponse = ObjectMapper.mapToProductResponse(product);
 		} catch (error) {
 			throw new InternalServerErrorException(ResponseMessages.ERROR);
 		}
 		return {
 			status: true,
 			message: 'success',
-			body: product
+			body: productResponse
 		};
 	}
 
