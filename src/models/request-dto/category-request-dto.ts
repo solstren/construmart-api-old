@@ -13,7 +13,4 @@ export class CategoryRequestDto {
 
 	@ApiModelProperty({ required: false, description: 'the image file to be sent via form-data' })
 	readonly imageFile?: any;
-
-	@ApiModelProperty({ required: false, nullable: true, description: 'The name of the image file with extension' })
-	imageFileName?: string;
 }

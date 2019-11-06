@@ -114,13 +114,9 @@ export class CategoriesService {
 		if (!category) {
 			throw new NotFoundException(ResponseMessages.CATEGORY_DOES_NOT_EXIST);
 		}
-		// if (!request.rowVersion || request.rowVersion !== category.rowVersion) {
-		//   throw new HttpException(ResponseMessages.ERROR, HttpStatus.NOT_MODIFIED);
-		// }
-		if (file) request.imageFileName = file.filename;
 		category.name = request.name || category.name;
 		category.description = request.description || category.description;
-		category.imageName = request.imageFileName || category.imageName;
+		category.imageName = file ? file.filename : category.imageName;
 
 		const result: Category = await this._categoryRepo.save(category);
 		if (!result) {

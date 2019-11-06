@@ -118,11 +118,10 @@ export class ProductsService {
 		var category = await this._categoryRepo.findOne(request.categoryId);
 		if (!category) throw new UnprocessableEntityException(ResponseMessages.CATEGORY_DOES_NOT_EXIST);
 
-		if (file) request.imageFileName = file.filename;
 		product.name = request.name || product.name;
 		product.description = request.description || product.description;
 		product.price = request.price || product.price;
-		product.imageName = request.imageFileName || product.imageName;
+		product.imageName = file ? file.filename : product.imageName;
 		product.category = category;
 		
 		const result: Product = await this._productRepo.save(product);
