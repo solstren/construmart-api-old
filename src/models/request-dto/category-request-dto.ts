@@ -8,12 +8,9 @@ export class CategoryRequestDto {
 	@IsDefined()
 	readonly name: string;
 
-	@ApiModelProperty({ type: String })
+	@ApiModelProperty({ required: false, type: String })
 	readonly description?: string;
 
 	@ApiModelProperty({ required: false, description: 'the image file to be sent via form-data' })
 	readonly imageFile?: any;
-
-	@ApiModelProperty({ required: false, nullable: true, description: 'The name of the image file with extension' })
-	imageFileName?: string;
 }

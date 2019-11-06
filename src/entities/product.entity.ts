@@ -11,7 +11,7 @@ export class Product extends BaseEntity {
     @Column({ type: 'text', nullable: true })
     description: string;
 
-    @Column({ type: 'money', default: 0.00 })
+    @Column({ type: "decimal", default: 0.00 })
     price: number;
 
     @Column({ name: 'image_url', type: 'varchar', nullable: true })

@@ -15,7 +15,8 @@ import {
 	UseInterceptors,
 	Delete,
 	UploadedFile,
-	Res
+	Res,
+	Logger
 } from '@nestjs/common';
 import { CategoriesService } from './services/categories.service';
 import {
@@ -121,7 +122,6 @@ export class CategoriesController {
 	@ApiInternalServerErrorResponse({
 		description: AppConstants.SWAGGER_500_DESCRIPTION
 	})
-	// @ApiImplicitBody({name: 'category-request-dto', type: CategoryRequestDto, required: true})
 	@ApiConsumes('multipart/form-data')
 	@ApiImplicitFile({ name: 'imageFile', required: false, description: 'the image file for the category' })
 	@Put('/:id')
@@ -132,6 +132,15 @@ export class CategoriesController {
 		@UploadedFile() file: FileUploadRequest,
 		@Body() request: CategoryRequestDto
 	): Promise<BaseResponse> {
+		// try {
+		// 	Logger.log('Heeeeeeeeeeeeeeeeeel000');
+		// 	if (!request) Logger.log('-------problem!!!!!');
+		// 	Logger.log(`request ==> ${request}`);
+		// } catch (error) {
+		// 	console.log(error);
+		// 	Logger.error(error)
+		// }
+		Logger.log(`request ==> ${request.name}`);
 		return await this._categoryService.updateCategory(id, file, request);
 	}
 

@@ -27,7 +27,7 @@ export class CategoriesService {
 
 	async getCategoryById(id: number): Promise<BaseResponse> {
 		let category: Category;
-		category = await this._categoryRepo.findOne(id, {loadRelationIds: true});
+		category = await this._categoryRepo.findOne(id, { loadRelationIds: true });
 		console.log(`category => ${category}`);
 		if (!category) {
 			throw new NotFoundException(`Category with id '${id}' not found`);
@@ -48,7 +48,7 @@ export class CategoriesService {
 		return {
 			status: true,
 			message: ResponseMessages.SUCCESS,
-			body: categories,
+			body: categories
 		};
 	}
 
@@ -101,7 +101,7 @@ export class CategoriesService {
 		return {
 			status: true,
 			message: ResponseMessages.CREATE_CATEGORY_SUCCESS,
-			body: category,
+			body: category
 		};
 	}
 
@@ -111,22 +111,21 @@ export class CategoriesService {
 		request: Partial<CategoryRequestDto>
 	): Promise<BaseResponse> {
 		const category = await this._categoryRepo.findOne(id);
-		console.log(category)
 		if (!category) {
 			throw new NotFoundException(ResponseMessages.CATEGORY_DOES_NOT_EXIST);
 		}
-		// if (!request.rowVersion || request.rowVersion !== category.rowVersion) {
-		//   throw new HttpException(ResponseMessages.ERROR, HttpStatus.NOT_MODIFIED);
-		// }
-		request.imageFileName = file.filename;
-		const result: UpdateResult = await this._categoryRepo.update({ id }, request);
-		if (!result || result.affected <= 0) {
+		category.name = request.name || category.name;
+		category.description = request.description || category.description;
+		category.imageName = file ? file.filename : category.imageName;
+
+		const result: Category = await this._categoryRepo.save(category);
+		if (!result) {
 			throw new HttpException(ResponseMessages.ERROR, HttpStatus.NOT_MODIFIED);
 		}
 		return {
 			status: true,
 			message: ResponseMessages.UPDATE_CATEGORY_SUCCESS,
-			body: null,
+			body: null
 		};
 	}
 
