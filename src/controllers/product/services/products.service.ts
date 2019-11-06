@@ -117,18 +117,22 @@ export class ProductsService {
 		}
 		var category = await this._categoryRepo.findOne(request.categoryId);
 		if (!category) throw new UnprocessableEntityException(ResponseMessages.CATEGORY_DOES_NOT_EXIST);
-		// if (!request.rowVersion || request.rowVersion !== category.rowVersion) {
-		//   throw new HttpException(ResponseMessages.ERROR, HttpStatus.NOT_MODIFIED);
-		// }
+
 		if (file) request.imageFileName = file.filename;
-		const result: UpdateResult = await this._productRepo.update({ id }, request);
-		if (!result || result.affected <= 0) {
+		product.name = request.name || product.name;
+		product.description = request.description || product.description;
+		product.price = request.price || product.price;
+		product.imageName = request.imageFileName || product.imageName;
+		product.category = category;
+		
+		const result: Product = await this._productRepo.save(product);
+		if (!result) {
 			throw new HttpException(ResponseMessages.ERROR, HttpStatus.NOT_MODIFIED);
 		}
 		return {
 			status: true,
 			message: ResponseMessages.UPDATE_PRODUCT_SUCCESS,
-			body: null
+			body: result
 		};
 	}
 }

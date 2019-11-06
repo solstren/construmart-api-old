@@ -11,7 +11,8 @@ import {
 	UploadedFile,
 	Body,
 	HttpStatus,
-	Post
+	Post,
+	Logger
 } from '@nestjs/common';
 import { AppValidationPipe } from '../../shared/app-validation.pipe';
 import { HttpErrorFilter } from '../../shared/http-error.filter';
