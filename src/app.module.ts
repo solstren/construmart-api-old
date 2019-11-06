@@ -13,6 +13,7 @@ import { CategoriesModule } from './controllers/category/categories.module';
 import { ProductModule } from './controllers/product/products.module';
 import { ProductsController } from './controllers/product/products.controller';
 import { MulterModule } from '@nestjs/platform-express';
+import { InventoryModule } from './controllers/inventory/inventory.module';
 
 @Module({
 	imports: [
@@ -20,7 +21,8 @@ import { MulterModule } from '@nestjs/platform-express';
 		CoreModule,
 		ConfigModule,
 		CategoriesModule,
-		ProductModule
+		ProductModule,
+		InventoryModule
 	],
 	controllers: [ AppController ],
 	providers: [ AppService ]
