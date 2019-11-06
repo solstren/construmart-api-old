@@ -7,4 +7,6 @@ export class ProductResponse {
     imageName: string;
     categoryName: string;
     categoryId: number;
+    dateCreated: Date;
+    dateUpdated: Date;
 }

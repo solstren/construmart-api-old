@@ -16,7 +16,7 @@ export class ObjectMapper {
 			dateCreated: category.dateCreated,
 			dateUpdated: category.dateUpdated,
 			rowVersion: category.rowVersion,
-			productIDs: productIDs
+			productIDs: productIDs,
 		};
 		return response;
 	}
@@ -30,7 +30,9 @@ export class ObjectMapper {
 			description: product.description,
 			imageName: product.imageName,
 			categoryId: product.category.id,
-			categoryName: product.category.name
+			categoryName: product.category.name,
+			dateCreated: product.dateCreated,
+			dateUpdated: product.dateUpdated
 		}
 	}
 }
