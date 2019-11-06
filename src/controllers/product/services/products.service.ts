@@ -132,7 +132,7 @@ export class ProductsService {
 		return {
 			status: true,
 			message: ResponseMessages.UPDATE_PRODUCT_SUCCESS,
-			body: result
+			body: null
 		};
 	}
 }

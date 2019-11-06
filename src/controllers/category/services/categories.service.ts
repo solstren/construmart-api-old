@@ -129,7 +129,7 @@ export class CategoriesService {
 		return {
 			status: true,
 			message: ResponseMessages.UPDATE_CATEGORY_SUCCESS,
-			body: category
+			body: null
 		};
 	}
 
