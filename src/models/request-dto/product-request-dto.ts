@@ -8,7 +8,7 @@ export class ProductRequestDto {
 	@IsDefined()
 	name: string;
 
-	@ApiModelProperty({ type: String })
+	@ApiModelProperty({required: false, type: String })
 	description: string;
 
 	@IsCurrency({ allow_decimal: true, thousands_separator: ',', decimal_separator: ',' })
