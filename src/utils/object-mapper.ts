@@ -2,6 +2,8 @@ import { Category } from '../entities/category.entity';
 import { CategoryResponseDto } from '../models/response-dto/category-response-dto';
 import { Product } from '../entities/product.entity';
 import { ProductResponse } from '../models/response-dto/product-response';
+import { InventoryResponse } from '../models/response-dto/inventory-response-dto';
+import { Inventory } from '../entities/inventory.entity';
 
 export class ObjectMapper {
 	public static mapToCategoryResponse(category: Category): CategoryResponseDto {
@@ -33,6 +35,20 @@ export class ObjectMapper {
 			categoryName: product.category.name,
 			dateCreated: product.dateCreated,
 			dateUpdated: product.dateUpdated
+		}
+	}
+
+	public static mapToInventoryResponse(inventory: Inventory): InventoryResponse{
+		return {
+			id: inventory.id,
+			initialPrice: inventory.initialPrice,
+			initialQuatity: inventory.initialQuatity,
+			currentPrice: inventory.currentPrice,
+			currentQuantity: inventory.currentQuantity,
+			productId: inventory.product.id,
+			productName: inventory.product.name,
+			dateCreated: inventory.dateCreated,
+			dateUpdated: inventory.dateUpdated
 		}
 	}
 }
