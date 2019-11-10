@@ -31,7 +31,7 @@ export class ProductsService {
 		let product: Product;
 		let productResponse: ProductResponse;
 		try {
-			product = await this._productRepo.findOne(id, { loadEagerRelations: true, relations: ['category'] });
+			product = await this._productRepo.findOne(id, { loadEagerRelations: true, relations: [ 'category' ] });
 			if (!product) {
 				throw new NotFoundException(`Product with id '${id}' not found`);
 			}
@@ -45,7 +45,7 @@ export class ProductsService {
 			body: productResponse
 		};
 	}
-	
+
 	async getAllProducts(): Promise<BaseResponse> {
 		let products: Product[];
 		let productResponses: ProductResponse[] = [];
@@ -53,12 +53,14 @@ export class ProductsService {
 			products = await this._productRepo.find({
 				order: { name: 'ASC' },
 				loadEagerRelations: true,
-				relations: ['category']
+				relations: [ 'category' ]
 			});
-			products.forEach(product => {
-				let productResponse = ObjectMapper.mapToProductResponse(product);
-				productResponses.push(productResponse);
-			});
+			if (products.length > 0) {
+				products.forEach((product) => {
+					let productResponse = ObjectMapper.mapToProductResponse(product);
+					productResponses.push(productResponse);
+				});
+			}
 		} catch (ex) {
 			Logger.log(ex);
 			throw new InternalServerErrorException(ex);
@@ -135,7 +137,7 @@ export class ProductsService {
 		product.price = request.price || product.price;
 		product.imageName = file ? file.filename : product.imageName;
 		product.category = category;
-		
+
 		const result: Product = await this._productRepo.save(product);
 		if (!result) {
 			throw new HttpException(ResponseMessages.ERROR, HttpStatus.NOT_MODIFIED);

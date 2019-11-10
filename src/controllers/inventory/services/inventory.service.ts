@@ -8,6 +8,7 @@ import { ProductsRepository } from '../../../controllers/product/repositories/pr
 import { Product } from '../../../entities/product.entity';
 import { ResponseMessages } from '../../../utils/response-messages';
 import { InventoryRequestDto } from '../../../models/request-dto/inventory-request-dto';
+import { InventoryResponse } from '../../../models/response-dto/inventory-response-dto';
 
 @Injectable()
 export class InventoryService {
@@ -28,17 +29,35 @@ export class InventoryService {
 	}
 
 	async addProductToInvetory(request: InventoryRequestDto): Promise<BaseResponse> {
-		var product = await this._productRepo.findOne(request.productId);
+		let product = await this._productRepo.findOne(request.productId);
 		if (!product) throw new UnprocessableEntityException('product does not exist');
 		let inventory: Inventory = ObjectMapper.MapToInventoryEntity(request);
 		inventory.product = product;
 		const isExist: boolean = await this._inventoryRepo.hasInventory(inventory);
-		console.log(`isExist ==> ${isExist}`);
 		if (isExist) {
 			throw new UnprocessableEntityException(`Product '${product.name}' already exists in inventory`);
 		}
 		const inventoryResult = await this._inventoryRepo.insertInventory(inventory);
 		const result = ObjectMapper.mapToInventoryResponse(inventoryResult);
+		return {
+			status: true,
+			message: ResponseMessages.SUCCESS,
+			body: result
+		};
+	}
+
+	async getAllInventories(): Promise<BaseResponse> {
+		const inventories = await this._inventoryRepo.find({
+			order: { id: 'ASC' },
+			loadEagerRelations: true,
+			relations: [ 'product' ]
+		});
+		const result: InventoryResponse[] = [];
+		if (inventories.length > 0) {
+			inventories.forEach((inventory) => {
+				result.push(ObjectMapper.mapToInventoryResponse(inventory));
+			});
+		}
 		return {
 			status: true,
 			message: ResponseMessages.SUCCESS,

@@ -8,7 +8,7 @@ import { BaseResponse } from '../../models/response-dto/base-response';
 import { ApiOkResponse, ApiNotFoundResponse, ApiInternalServerErrorResponse, ApiUseTags, ApiCreatedResponse, ApiBadRequestResponse, ApiUnprocessableEntityResponse, ApiConsumes, ApiImplicitFile } from '@nestjs/swagger';
 import { InventoryRequestDto } from '../../models/request-dto/inventory-request-dto';
 
-@Controller(`${AppConstants.APP_BASE_URL}inventory`)
+@Controller(`${AppConstants.APP_BASE_URL}inventories`)
 @UsePipes(AppValidationPipe)
 @UseFilters(HttpErrorFilter)
 @UseInterceptors(LoggerInterceptor)
@@ -54,5 +54,18 @@ export class InventoryController {
 	@Post()
 	async postCategory(@Body() request: InventoryRequestDto): Promise<BaseResponse> {
 		return await this._inventoryService.addProductToInvetory(request);
+	}
+
+	@ApiUseTags(AppConstants.SWAGGER_ADMIN_TAG)
+    @ApiOkResponse({
+		description: AppConstants.SWAGGER_200_DESCRIPTION,
+		type: BaseResponse
+	})
+	@ApiInternalServerErrorResponse({
+		description: AppConstants.SWAGGER_500_DESCRIPTION
+	})
+	@Get()
+	async getInventories(): Promise<BaseResponse> {
+		return await this._inventoryService.getAllInventories();
 	}
 }
