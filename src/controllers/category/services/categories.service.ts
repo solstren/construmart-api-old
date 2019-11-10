@@ -20,15 +20,18 @@ import { CategoryResponseDto } from '../../../models/response-dto/category-respo
 import { ObjectMapper } from '../../../utils/object-mapper';
 import { validate } from '@babel/types';
 import { UpdateResult } from 'typeorm';
+import { ProductsRepository } from '../../../controllers/product/repositories/products.repository';
 
 @Injectable()
 export class CategoriesService {
-	constructor(@InjectRepository(CategoriesRepository) private readonly _categoryRepo: CategoriesRepository) {}
+	constructor(
+		@InjectRepository(CategoriesRepository) private readonly _categoryRepo: CategoriesRepository,
+		@InjectRepository(ProductsRepository) private readonly _productRepo: ProductsRepository
+	) {}
 
 	async getCategoryById(id: number): Promise<BaseResponse> {
 		let category: Category;
 		category = await this._categoryRepo.findOne(id, { loadRelationIds: true });
-		console.log(`category => ${category}`);
 		if (!category) {
 			throw new NotFoundException(`Category with id '${id}' not found`);
 		}
@@ -53,10 +56,8 @@ export class CategoriesService {
 	}
 
 	async getProductsByCategory(categoryId: number): Promise<BaseResponse> {
-		let products: Product[];
-		const category = await this._categoryRepo.findOne(categoryId, { relations: [ 'products' ] });
-		if (!category) throw new NotFoundException(ResponseMessages.CATEGORY_DOES_NOT_EXIST);
-		products = category.products.sort();
+		const products = await this._productRepo.getProductsByCategoryId(categoryId);
+		if (!products) throw new NotFoundException(ResponseMessages.CATEGORY_DOES_NOT_EXIST);
 		return {
 			status: true,
 			message: ResponseMessages.SUCCESS,
@@ -65,12 +66,7 @@ export class CategoriesService {
 	}
 
 	async getProductByCategory(categoryId: number, productId: number): Promise<BaseResponse> {
-		let product: Product;
-		const category = await this._categoryRepo.findOne(categoryId, { relations: [ 'products' ] });
-		console.log(`category => ${category}`);
-		if (!category) throw new NotFoundException(ResponseMessages.CATEGORY_DOES_NOT_EXIST);
-		product = category.products.find((value, index, obj) => value.id == productId);
-		console.log(`product ==> ${product}`);
+		const product = await this._productRepo.getProductByCategoryId(categoryId, productId);
 		if (!product) throw new NotFoundException(ResponseMessages.PRODUCT_DOES_NOT_EXIST_IN_CATEGORY);
 		return {
 			status: true,
