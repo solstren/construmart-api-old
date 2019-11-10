@@ -15,6 +15,7 @@ import { ProductsController } from './controllers/product/products.controller';
 import { MulterModule } from '@nestjs/platform-express';
 import { InventoryModule } from './controllers/inventory/inventory.module';
 import { InventoryController } from './controllers/inventory/inventory.controller';
+import { InventoryService } from './controllers/inventory/services/inventory.service';
 
 @Module({
 	imports: [
@@ -25,7 +26,7 @@ import { InventoryController } from './controllers/inventory/inventory.controlle
 		ProductModule,
 		InventoryModule
 	],
-	controllers: [ AppController, InventoryController ],
+	controllers: [ AppController ],
 	providers: [ AppService ]
 })
 export class AppModule {}

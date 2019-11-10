@@ -45,7 +45,7 @@ export class ProductsService {
 			body: productResponse
 		};
 	}
-
+	
 	async getAllProducts(): Promise<BaseResponse> {
 		let products: Product[];
 		let productResponses: ProductResponse[] = [];
