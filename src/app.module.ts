@@ -27,6 +27,6 @@ import { InventoryService } from './controllers/inventory/services/inventory.ser
 		InventoryModule
 	],
 	controllers: [ AppController ],
-	providers: [ AppService, InventoryService ]
+	providers: [ AppService ]
 })
 export class AppModule {}

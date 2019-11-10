@@ -4,6 +4,7 @@ import { Product } from '../entities/product.entity';
 import { ProductResponse } from '../models/response-dto/product-response';
 import { InventoryResponse } from '../models/response-dto/inventory-response-dto';
 import { Inventory } from '../entities/inventory.entity';
+import { InventoryRequestDto } from '../models/request-dto/inventory-request-dto';
 
 export class ObjectMapper {
 	public static mapToCategoryResponse(category: Category): CategoryResponseDto {
@@ -18,13 +19,12 @@ export class ObjectMapper {
 			dateCreated: category.dateCreated,
 			dateUpdated: category.dateUpdated,
 			rowVersion: category.rowVersion,
-			productIDs: productIDs,
+			productIDs: productIDs
 		};
 		return response;
 	}
 
-	public static mapToProductResponse(product: Product): ProductResponse
-	{
+	public static mapToProductResponse(product: Product): ProductResponse {
 		return {
 			id: product.id,
 			name: product.name,
@@ -35,10 +35,10 @@ export class ObjectMapper {
 			categoryName: product.category.name,
 			dateCreated: product.dateCreated,
 			dateUpdated: product.dateUpdated
-		}
+		};
 	}
 
-	public static mapToInventoryResponse(inventory: Inventory): InventoryResponse{
+	public static mapToInventoryResponse(inventory: Inventory): InventoryResponse {
 		return {
 			id: inventory.id,
 			initialPrice: inventory.initialPrice,
@@ -49,6 +49,15 @@ export class ObjectMapper {
 			productName: inventory.product.name,
 			dateCreated: inventory.dateCreated,
 			dateUpdated: inventory.dateUpdated
-		}
+		};
+	}
+
+	public static MapToInventoryEntity(request: InventoryRequestDto): Inventory {
+		let inventory = new Inventory();
+		inventory.currentPrice = request.currentPrice;
+		inventory.currentQuantity = request.currentQuantity;
+		inventory.initialPrice = request.initialPrice;
+		inventory.initialQuatity = request.initialQuatity;
+		return inventory;
 	}
 }
