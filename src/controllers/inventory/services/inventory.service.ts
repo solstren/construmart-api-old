@@ -28,29 +28,31 @@ export class InventoryService {
 		};
 	}
 
-	async addProductToInvetory(request: InventoryRequestDto): Promise<BaseResponse> {
-		let product = await this._productRepo.findOne(request.productId);
-		if (!product) throw new UnprocessableEntityException('product does not exist');
-		let inventory: Inventory = ObjectMapper.MapToInventoryEntity(request);
-		inventory.product = product;
-		const isExist: boolean = await this._inventoryRepo.hasInventory(inventory);
-		if (isExist) {
-			throw new UnprocessableEntityException(`Product '${product.name}' already exists in inventory`);
-		}
-		const inventoryResult = await this._inventoryRepo.insertInventory(inventory);
-		const result = ObjectMapper.mapToInventoryResponse(inventoryResult);
-		return {
-			status: true,
-			message: ResponseMessages.SUCCESS,
-			body: result
-		};
-	}
+	// async addProductToInvetory(request: InventoryRequestDto): Promise<BaseResponse> {
+	// 	let product = await this._productRepo.findOne(request.productId);
+	// 	if (!product) throw new UnprocessableEntityException('product does not exist');
+	// 	let inventory: Inventory = ObjectMapper.MapToInventoryEntity(request);
+	// 	inventory.product = product;
+	// 	const isExist: boolean = await this._inventoryRepo.hasInventory(inventory);
+	// 	if (isExist) {
+	// 		throw new UnprocessableEntityException(`Product '${product.name}' already exists in inventory`);
+	// 	}
+	// 	const inventoryResult = await this._inventoryRepo.insertInventory(inventory);
+	// 	const result = ObjectMapper.mapToInventoryResponse(inventoryResult);
+	// 	return {
+	// 		status: true,
+	// 		message: ResponseMessages.SUCCESS,
+	// 		body: result
+	// 	};
+	// }
 
-	async getAllInventories(): Promise<BaseResponse> {
+	async getAllInventories(page: number = 1, itemCount: number = 10): Promise<BaseResponse> {
 		const inventories = await this._inventoryRepo.find({
 			order: { id: 'ASC' },
 			loadEagerRelations: true,
-			relations: [ 'product' ]
+			relations: [ 'product' ],
+			take: itemCount,
+			skip: itemCount * (page - 1)
 		});
 		const result: InventoryResponse[] = [];
 		if (inventories.length > 0) {

@@ -8,11 +8,12 @@ import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { editFileName } from '../../utils/edit-filename';
 import { imageFileValidator } from '../../utils/image-validator';
+import { InventoryRepository } from '../inventory/repository/inventory.repository';
 
 @Module({
 	controllers: [ ProductsController ],
 	imports: [
-		TypeOrmModule.forFeature([ ProductsRepository, CategoriesRepository ]),
+		TypeOrmModule.forFeature([ ProductsRepository, CategoriesRepository, InventoryRepository]),
 		MulterModule.register({
 			storage: diskStorage({ filename: editFileName, destination: './uploads' }),
 			fileFilter: imageFileValidator

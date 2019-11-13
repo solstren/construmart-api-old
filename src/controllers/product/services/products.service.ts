@@ -19,10 +19,13 @@ import { CategoriesRepository } from '../../../controllers/category/repositories
 import { ObjectMapper } from '../../../utils/object-mapper';
 import { Category } from '../../../entities/category.entity';
 import { ProductResponse } from '../../../models/response-dto/product-response';
+import { Inventory } from '../../../entities/inventory.entity';
+import { InventoryRepository } from '../../../controllers/inventory/repository/inventory.repository';
 
 @Injectable()
 export class ProductsService {
 	constructor(
+		@InjectRepository(InventoryRepository) private readonly _inventoryRepo: InventoryRepository,
 		@InjectRepository(ProductsRepository) private readonly _productRepo: ProductsRepository,
 		@InjectRepository(CategoriesRepository) private readonly _categoryRepo: CategoriesRepository
 	) {}
@@ -46,14 +49,16 @@ export class ProductsService {
 		};
 	}
 
-	async getAllProducts(): Promise<BaseResponse> {
+	async getAllProducts(page: number = 1, itemCount: number = 10): Promise<BaseResponse> {
 		let products: Product[];
 		let productResponses: ProductResponse[] = [];
 		try {
 			products = await this._productRepo.find({
 				order: { name: 'ASC' },
 				loadEagerRelations: true,
-				relations: [ 'category' ]
+				relations: [ 'category' ],
+				take: itemCount,
+				skip: itemCount * (page - 1)
 			});
 			if (products.length > 0) {
 				products.forEach((product) => {
@@ -78,6 +83,8 @@ export class ProductsService {
 			throw new NotFoundException(`Product with id ${id} not found`);
 		}
 		await this._productRepo.remove(product);
+		const inventory = await this._inventoryRepo.getInventoryByProductId(product.id);
+		await this._inventoryRepo.remove(inventory);
 		return {
 			status: true,
 			message: ResponseMessages.SUCCESS,
@@ -106,13 +113,25 @@ export class ProductsService {
 		product.category = category;
 		await this._productRepo.save(product);
 
+		let inventory: Inventory = new Inventory();
+		inventory.initialPrice = 0;
+		inventory.initialQuatity = 0;
+		inventory.currentPrice = 0;
+		inventory.currentQuantity = 0;
+		inventory.product = product;
+		
+		const inventoryResult = await this._inventoryRepo.insertInventory(inventory);
+		// const result = ObjectMapper.mapToInventoryResponse(inventoryResult);
+		console.log(`product==>${product}`);
+		console.log(`inventory ==> ${inventory}`);
 		const createdProduct: Product = await this._productRepo.findOne(product.id, {
 			loadEagerRelations: true,
 			loadRelationIds: true
 		});
 		if (product.id <= 0) {
-			throw new UnprocessableEntityException('Failed to create category');
+			throw new UnprocessableEntityException('Failed to create product');
 		}
+
 		return {
 			status: true,
 			message: ResponseMessages.CREATE_PRODUCT_SUCCESS,

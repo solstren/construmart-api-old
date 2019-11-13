@@ -16,7 +16,8 @@ import {
 	Delete,
 	UploadedFile,
 	Res,
-	Logger
+	Logger,
+	Query
 } from '@nestjs/common';
 import { CategoriesService } from './services/categories.service';
 import {
@@ -77,8 +78,13 @@ export class CategoriesController {
 		description: AppConstants.SWAGGER_500_DESCRIPTION
 	})
 	@Get()
-	async getAllCategories(): Promise<BaseResponse> {
-		return await this._categoryService.getAllCategories();
+	async getAllCategories(
+		@Query('pageNumber', ParseIntPipe)
+		pageNumber: number,
+		@Query('pageSize', ParseIntPipe)
+		pageSize: number
+	): Promise<BaseResponse> {
+		return await this._categoryService.getAllCategories(pageNumber, pageSize);
 	}
 
 	@ApiUseTags(AppConstants.SWAGGER_ADMIN_TAG)

@@ -42,11 +42,13 @@ export class CategoriesService {
 		};
 	}
 
-	async getAllCategories(): Promise<BaseResponse> {
+	async getAllCategories(page: number = 10, itemCount: number = 10): Promise<BaseResponse> {
 		let categories: Category[];
 		categories = await this._categoryRepo.find({
 			order: { name: 'ASC' },
-			loadRelationIds: true
+			loadRelationIds: true,
+			take: itemCount,
+			skip: itemCount * (page - 1)
 		});
 		return {
 			status: true,

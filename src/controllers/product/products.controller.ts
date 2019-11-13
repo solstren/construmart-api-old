@@ -12,7 +12,8 @@ import {
 	Body,
 	HttpStatus,
 	Post,
-	Logger
+	Logger,
+	Query
 } from '@nestjs/common';
 import { AppValidationPipe } from '../../shared/app-validation.pipe';
 import { HttpErrorFilter } from '../../shared/http-error.filter';
@@ -75,8 +76,13 @@ export class ProductsController {
 		description: AppConstants.SWAGGER_500_DESCRIPTION
 	})
 	@Get()
-	async getAllProducts(): Promise<BaseResponse> {
-		return await this._productService.getAllProducts();
+	async getAllProducts(
+		@Query('pageNumber', ParseIntPipe)
+		pageNumber: number,
+		@Query('pageSize', ParseIntPipe)
+		pageSize: number
+	): Promise<BaseResponse> {
+		return await this._productService.getAllProducts(pageNumber, pageSize);
 	}
 
 	@ApiUseTags(AppConstants.SWAGGER_ADMIN_TAG)
