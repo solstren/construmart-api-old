@@ -21,6 +21,7 @@ import { Category } from '../../../entities/category.entity';
 import { ProductResponse } from '../../../models/response-dto/product-response';
 import { Inventory } from '../../../entities/inventory.entity';
 import { InventoryRepository } from '../../../controllers/inventory/repository/inventory.repository';
+import { SortOrder } from '../../../models/request-dto/sort-order-enum';
 
 @Injectable()
 export class ProductsService {
@@ -122,12 +123,6 @@ export class ProductsService {
 		
 		const inventoryResult = await this._inventoryRepo.insertInventory(inventory);
 		// const result = ObjectMapper.mapToInventoryResponse(inventoryResult);
-		console.log(`product==>${product}`);
-		console.log(`inventory ==> ${inventory}`);
-		const createdProduct: Product = await this._productRepo.findOne(product.id, {
-			loadEagerRelations: true,
-			loadRelationIds: true
-		});
 		if (product.id <= 0) {
 			throw new UnprocessableEntityException('Failed to create product');
 		}
@@ -135,7 +130,7 @@ export class ProductsService {
 		return {
 			status: true,
 			message: ResponseMessages.CREATE_PRODUCT_SUCCESS,
-			body: createdProduct
+			body: product
 		};
 	}
 

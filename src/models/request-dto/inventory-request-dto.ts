@@ -4,7 +4,7 @@ import { IsNotEmpty } from "class-validator";
 export class InventoryRequestDto {
     @ApiModelProperty({ required: true, type: Number, nullable: false })
     @IsNotEmpty()
-    initialQuatity: number;
+    initialQuantity: number;
 
     @ApiModelProperty({ required: true, type: Number, nullable: false })
     @IsNotEmpty()

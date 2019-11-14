@@ -10,4 +10,6 @@ export class ResponseMessages {
     static UPDATE_PRODUCT_SUCCESS = 'Product updated successfully';
     static PRODUCT_EXISTS = 'A Product with that name already exists';
     static PRODUCT_DOES_NOT_EXIST = 'That Product does not exist';
+    static UPDATE_INVENTORY_SUCCESS = 'Inventory has been updated successfully';
+    static UPDATE_INVENTORY_HISTORY_FAILURE = 'Failed to update inventory history';
 }

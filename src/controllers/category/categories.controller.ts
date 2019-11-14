@@ -79,12 +79,12 @@ export class CategoriesController {
 	})
 	@Get()
 	async getAllCategories(
-		@Query('pageNumber', ParseIntPipe)
-		pageNumber: number,
-		@Query('pageSize', ParseIntPipe)
-		pageSize: number
+		@Query('offset', ParseIntPipe)
+		offset: number,
+		@Query('limit', ParseIntPipe)
+		limit: number
 	): Promise<BaseResponse> {
-		return await this._categoryService.getAllCategories(pageNumber, pageSize);
+		return await this._categoryService.getAllCategories(offset, limit);
 	}
 
 	@ApiUseTags(AppConstants.SWAGGER_ADMIN_TAG)
@@ -138,15 +138,6 @@ export class CategoriesController {
 		@UploadedFile() file: FileUploadRequest,
 		@Body() request: CategoryRequestDto
 	): Promise<BaseResponse> {
-		// try {
-		// 	Logger.log('Heeeeeeeeeeeeeeeeeel000');
-		// 	if (!request) Logger.log('-------problem!!!!!');
-		// 	Logger.log(`request ==> ${request}`);
-		// } catch (error) {
-		// 	console.log(error);
-		// 	Logger.error(error)
-		// }
-		Logger.log(`request ==> ${request.name}`);
 		return await this._categoryService.updateCategory(id, file, request);
 	}
 

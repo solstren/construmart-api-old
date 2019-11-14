@@ -32,11 +32,13 @@ import {
 	ApiResponse,
 	ApiCreatedResponse,
 	ApiBadRequestResponse,
-	ApiUnprocessableEntityResponse
+	ApiUnprocessableEntityResponse,
+	ApiImplicitQuery
 } from '@nestjs/swagger';
 import { ProductRequestDto } from '../../models/request-dto/product-request-dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FileUploadRequest } from '../../models/request-dto/file-upload-request';
+import { SortOrder } from '../../models/request-dto/sort-order-enum';
 
 @Controller(`${AppConstants.APP_BASE_URL}products`)
 @UsePipes(AppValidationPipe)
@@ -77,12 +79,12 @@ export class ProductsController {
 	})
 	@Get()
 	async getAllProducts(
-		@Query('pageNumber', ParseIntPipe)
-		pageNumber: number,
-		@Query('pageSize', ParseIntPipe)
-		pageSize: number
+		@Query('offset', ParseIntPipe)
+		limit: number,
+		@Query('limit', ParseIntPipe)
+		offset: number
 	): Promise<BaseResponse> {
-		return await this._productService.getAllProducts(pageNumber, pageSize);
+		return await this._productService.getAllProducts(offset, limit);
 	}
 
 	@ApiUseTags(AppConstants.SWAGGER_ADMIN_TAG)
