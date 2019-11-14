@@ -57,7 +57,7 @@ export class ObjectMapper {
 		inventory.currentPrice = request.currentPrice;
 		inventory.currentQuantity = request.currentQuantity;
 		inventory.initialPrice = request.initialPrice;
-		inventory.initialQuatity = request.initialQuatity;
+		inventory.initialQuatity = request.initialQuantity;
 		return inventory;
 	}
 }

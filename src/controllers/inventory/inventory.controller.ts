@@ -6,10 +6,10 @@ import {
 	ParseIntPipe,
 	Get,
 	Param,
-	Post,
-	UploadedFile,
 	Body,
-	Query
+	Query,
+	Put,
+	HttpStatus
 } from '@nestjs/common';
 import { AppConstants } from '../../utils/app-constants';
 import { AppValidationPipe } from '../../shared/app-validation.pipe';
@@ -22,11 +22,7 @@ import {
 	ApiNotFoundResponse,
 	ApiInternalServerErrorResponse,
 	ApiUseTags,
-	ApiCreatedResponse,
-	ApiBadRequestResponse,
-	ApiUnprocessableEntityResponse,
-	ApiConsumes,
-	ApiImplicitFile
+	ApiResponse
 } from '@nestjs/swagger';
 import { InventoryRequestDto } from '../../models/request-dto/inventory-request-dto';
 
@@ -50,33 +46,38 @@ export class InventoryController {
 		description: AppConstants.SWAGGER_500_DESCRIPTION
 	})
 	@Get('/:productId')
-	async getCategoryById(
+	async getInventoryByProductId(
 		@Param('productId', ParseIntPipe)
 		productId: number
 	): Promise<BaseResponse> {
 		return await this._inventoryService.getInventoryByProductId(productId);
 	}
 
-	// @ApiUseTags(AppConstants.SWAGGER_ADMIN_TAG)
-	// @ApiCreatedResponse({
-	// 	type: BaseResponse,
-	// 	description: AppConstants.SWAGGER_201_DESCRIPTION
-	// })
-	// @ApiBadRequestResponse({
-	// 	type: BaseResponse,
-	// 	description: AppConstants.SWAGGER_400_DESCRIPTION
-	// })
-	// @ApiUnprocessableEntityResponse({
-	// 	type: BaseResponse,
-	// 	description: AppConstants.SWAGGER_422_DESCRIPTION
-	// })
-	// @ApiInternalServerErrorResponse({
-	// 	description: AppConstants.SWAGGER_500_DESCRIPTION
-	// })
-	// @Post()
-	// async postCategory(@Body() request: InventoryRequestDto): Promise<BaseResponse> {
-	// 	return await this._inventoryService.addProductToInvetory(request);
-	// }
+	@ApiUseTags(AppConstants.SWAGGER_ADMIN_TAG)
+	@ApiResponse({
+		status: HttpStatus.NOT_MODIFIED,
+		type: BaseResponse,
+		description: AppConstants.SWAGGER_304_DESCRIPTION
+	})
+	@ApiOkResponse({
+		description: AppConstants.SWAGGER_200_DESCRIPTION,
+		type: BaseResponse
+	})
+	@ApiNotFoundResponse({
+		description: AppConstants.SWAGGER_404_DESCRIPTION,
+		type: BaseResponse
+	})
+	@ApiInternalServerErrorResponse({
+		description: AppConstants.SWAGGER_500_DESCRIPTION
+	})
+	@Put('/:id')
+	async updateInventory(
+		@Param('productId', ParseIntPipe)
+		productId: number,
+		@Body() request: InventoryRequestDto
+	): Promise<BaseResponse> {
+		return await this._inventoryService.updateInventory(request, productId);
+	}
 
 	@ApiUseTags(AppConstants.SWAGGER_ADMIN_TAG)
 	@ApiOkResponse({
@@ -88,11 +89,11 @@ export class InventoryController {
 	})
 	@Get()
 	async getInventories(
-		@Query('pageNumber', ParseIntPipe)
-		pageNumber: number,
-		@Query('pageSize', ParseIntPipe)
-		pageSize: number
+		@Query('offset', ParseIntPipe)
+		offset: number,
+		@Query('limit', ParseIntPipe)
+		limit: number
 	): Promise<BaseResponse> {
-		return await this._inventoryService.getAllInventories(pageNumber, pageSize);
+		return await this._inventoryService.getAllInventories(offset, limit);
 	}
 }

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnprocessableEntityException, HttpException, HttpStatus } from '@nestjs/common';
 import { InventoryRepository } from '../repository/inventory.repository';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Inventory } from '../../../entities/inventory.entity';
@@ -9,42 +9,26 @@ import { Product } from '../../../entities/product.entity';
 import { ResponseMessages } from '../../../utils/response-messages';
 import { InventoryRequestDto } from '../../../models/request-dto/inventory-request-dto';
 import { InventoryResponse } from '../../../models/response-dto/inventory-response-dto';
+import { InventoryHistoryRepository } from '../repository/inventory-history.repository';
 
 @Injectable()
 export class InventoryService {
 	constructor(
 		@InjectRepository(InventoryRepository) private readonly _inventoryRepo: InventoryRepository,
-		@InjectRepository(ProductsRepository) private readonly _productRepo: ProductsRepository
+		@InjectRepository(ProductsRepository) private readonly _productRepo: ProductsRepository,
+		@InjectRepository(InventoryHistoryRepository) private readonly _inventoryHistoryRepo: InventoryHistoryRepository
 	) {}
 
 	async getInventoryByProductId(productId: number): Promise<BaseResponse> {
 		const inventory = await this._inventoryRepo.getInventoryByProductId(productId);
 		if (!inventory) throw new NotFoundException('Product is not tracked in inventory');
-		const inventoryResponse = ObjectMapper.mapToInventoryResponse(inventory);
+		const inventoryResponse: InventoryResponse = ObjectMapper.mapToInventoryResponse(inventory);
 		return {
 			status: true,
 			message: ResponseMessages.SUCCESS,
 			body: inventoryResponse
 		};
 	}
-
-	// async addProductToInvetory(request: InventoryRequestDto): Promise<BaseResponse> {
-	// 	let product = await this._productRepo.findOne(request.productId);
-	// 	if (!product) throw new UnprocessableEntityException('product does not exist');
-	// 	let inventory: Inventory = ObjectMapper.MapToInventoryEntity(request);
-	// 	inventory.product = product;
-	// 	const isExist: boolean = await this._inventoryRepo.hasInventory(inventory);
-	// 	if (isExist) {
-	// 		throw new UnprocessableEntityException(`Product '${product.name}' already exists in inventory`);
-	// 	}
-	// 	const inventoryResult = await this._inventoryRepo.insertInventory(inventory);
-	// 	const result = ObjectMapper.mapToInventoryResponse(inventoryResult);
-	// 	return {
-	// 		status: true,
-	// 		message: ResponseMessages.SUCCESS,
-	// 		body: result
-	// 	};
-	// }
 
 	async getAllInventories(page: number = 1, itemCount: number = 10): Promise<BaseResponse> {
 		const inventories = await this._inventoryRepo.find({
@@ -64,6 +48,32 @@ export class InventoryService {
 			status: true,
 			message: ResponseMessages.SUCCESS,
 			body: result
+		};
+	}
+
+	async updateInventory(request: InventoryRequestDto, prodcuctId: number): Promise<BaseResponse> {
+		var oldInventory = await this._inventoryRepo.getInventoryByProductId(prodcuctId);
+		if (!oldInventory) throw new NotFoundException('Product is not tracked in inventory');
+		const inventoryRequest: InventoryRequestDto = {
+			initialQuantity: oldInventory.currentQuantity,
+			initialPrice: oldInventory.currentPrice,
+			currentQuantity: request.currentQuantity,
+			currentPrice: request.currentPrice,
+			productId: request.productId
+		};
+		const inventory = ObjectMapper.MapToInventoryEntity(inventoryRequest);
+		const isUpdated = await this._inventoryRepo.updateInventory(inventory, prodcuctId);
+		if (!isUpdated) throw new HttpException(ResponseMessages.ERROR, HttpStatus.NOT_MODIFIED);
+		const isInventoryHistoryUpdated = await this._inventoryHistoryRepo.updateInventoryHistory(
+			oldInventory,
+			prodcuctId
+		);
+		if (!isInventoryHistoryUpdated)
+			throw new HttpException(ResponseMessages.UPDATE_INVENTORY_HISTORY_FAILURE, HttpStatus.NOT_MODIFIED);
+		return {
+			status: true,
+			message: ResponseMessages.UPDATE_INVENTORY_SUCCESS,
+			body: null
 		};
 	}
 }
