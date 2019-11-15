@@ -76,4 +76,25 @@ export class InventoryService {
 			body: null
 		};
 	}
+
+	async getInventoryHistories(page: number = 1, itemCount: number = 10): Promise<BaseResponse> {
+		var inventoryHistories = await this._inventoryHistoryRepo.find({
+			loadEagerRelations: true,
+			relations: [ 'category' ],
+			take: itemCount,
+			skip: itemCount * (page - 1)
+		});
+		let inventoryHistoryResponses: InventoryResponse[] = [];
+		if (inventoryHistories.length > 0) {
+			inventoryHistories.forEach((inventoryHistory) => {
+				let inventoryHistoryResponse = ObjectMapper.mapToInventoryResponse(inventoryHistory);
+				inventoryHistoryResponses.push(inventoryHistoryResponse);
+			});
+		}
+		return {
+			status: true,
+			message: ResponseMessages.SUCCESS,
+			body: inventoryHistoryResponses
+		};
+	}
 }
