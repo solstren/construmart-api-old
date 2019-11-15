@@ -5,6 +5,7 @@ import { ProductResponse } from '../models/response-dto/product-response';
 import { InventoryResponse } from '../models/response-dto/inventory-response-dto';
 import { Inventory } from '../entities/inventory.entity';
 import { InventoryRequestDto } from '../models/request-dto/inventory-request-dto';
+import { InventoryHistory } from '../entities/inventory-history.entity';
 
 export class ObjectMapper {
 	public static mapToCategoryResponse(category: Category): CategoryResponseDto {
@@ -38,7 +39,7 @@ export class ObjectMapper {
 		};
 	}
 
-	public static mapToInventoryResponse(inventory: Inventory): InventoryResponse {
+	public static mapToInventoryResponse(inventory: Inventory | InventoryHistory): InventoryResponse {
 		return {
 			id: inventory.id,
 			initialPrice: inventory.initialPrice,
