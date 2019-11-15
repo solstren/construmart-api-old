@@ -30,13 +30,36 @@ export class InventoryService {
 		};
 	}
 
-	async getAllInventories(page: number = 1, itemCount: number = 10): Promise<BaseResponse> {
+	async getAllInventoriesPaginated(page: number = 1, itemCount: number = 10): Promise<BaseResponse> {
+		try {
+			const inventories = await this._inventoryRepo.find({
+				order: { id: 'ASC' },
+				loadEagerRelations: true,
+				relations: [ 'product' ],
+				take: itemCount,
+				skip: itemCount * (page - 1)
+			});
+			const result: InventoryResponse[] = [];
+			if (inventories.length > 0) {
+				inventories.forEach((inventory) => {
+					result.push(ObjectMapper.mapToInventoryResponse(inventory));
+				});
+			}
+			return {
+				status: true,
+				message: ResponseMessages.SUCCESS,
+				body: result
+			};
+		} catch (error) {
+			console.log(`error ==> ${error}`);
+		}
+	}
+
+	async getAllInventories(): Promise<BaseResponse>{
 		const inventories = await this._inventoryRepo.find({
 			order: { id: 'ASC' },
 			loadEagerRelations: true,
-			relations: [ 'product' ],
-			take: itemCount,
-			skip: itemCount * (page - 1)
+			relations: [ 'product' ]
 		});
 		const result: InventoryResponse[] = [];
 		if (inventories.length > 0) {

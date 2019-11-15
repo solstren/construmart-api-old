@@ -74,7 +74,10 @@ export class ProductsService {
 		return {
 			status: true,
 			message: ResponseMessages.SUCCESS,
-			body: productResponses
+			body: {
+				products: productResponses,
+				totalCount: productResponses.length
+			}
 		};
 	}
 

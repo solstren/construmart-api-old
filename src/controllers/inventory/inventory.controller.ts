@@ -87,14 +87,31 @@ export class InventoryController {
 	@ApiInternalServerErrorResponse({
 		description: AppConstants.SWAGGER_500_DESCRIPTION
 	})
-	@Get()
-	async getInventories(
+	@Get('/paginated')
+	async getInventoriesPaginted(
 		@Query('offset', ParseIntPipe)
 		offset: number,
 		@Query('limit', ParseIntPipe)
 		limit: number
 	): Promise<BaseResponse> {
-		return await this._inventoryService.getAllInventories(offset, limit);
+		try {
+			return await this._inventoryService.getAllInventoriesPaginated(offset, limit);
+		} catch (error) {
+			console.log(`error ==> ${error}`);
+		}
+	}
+
+	@ApiUseTags(AppConstants.SWAGGER_ADMIN_TAG)
+	@ApiOkResponse({
+		description: AppConstants.SWAGGER_200_DESCRIPTION,
+		type: BaseResponse
+	})
+	@ApiInternalServerErrorResponse({
+		description: AppConstants.SWAGGER_500_DESCRIPTION
+	})
+	@Get()
+	async getInventories(): Promise<BaseResponse> {
+		return await this._inventoryService.getAllInventories();
 	}
 
 	@ApiOkResponse({

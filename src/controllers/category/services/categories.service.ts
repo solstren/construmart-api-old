@@ -53,7 +53,10 @@ export class CategoriesService {
 		return {
 			status: true,
 			message: ResponseMessages.SUCCESS,
-			body: categories
+			body: {
+				categories: categories,
+				totalCount: categories.length
+			}
 		};
 	}
 
