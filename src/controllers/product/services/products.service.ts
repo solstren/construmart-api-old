@@ -50,7 +50,7 @@ export class ProductsService {
 		};
 	}
 
-	async getAllProducts(page: number = 1, itemCount: number = 10): Promise<BaseResponse> {
+	async getAllProducts(page: number, itemCount: number): Promise<BaseResponse> {
 		let products: Product[] = [];
 		let productResponses: ProductResponse[] = [];
 		if (page <= 0 || itemCount <= 0) {

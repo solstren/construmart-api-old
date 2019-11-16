@@ -94,27 +94,6 @@ export class InventoryController {
 		@Query('limit', ParseIntPipe)
 		limit: number
 	): Promise<BaseResponse> {
-		return await this._inventoryService.getAllInventories();
-	}
-
-	@ApiOkResponse({
-		description: AppConstants.SWAGGER_200_DESCRIPTION,
-		type: BaseResponse
-	})
-	@ApiNotFoundResponse({
-		description: AppConstants.SWAGGER_404_DESCRIPTION,
-		type: BaseResponse
-	})
-	@ApiInternalServerErrorResponse({
-		description: AppConstants.SWAGGER_500_DESCRIPTION
-	})
-	@Get('/history')
-	async getAllInventoryHistory(
-		@Query('offset', ParseIntPipe)
-		offset: number,
-		@Query('limit', ParseIntPipe)
-		limit: number
-	): Promise<BaseResponse> {
-		return await this._inventoryService.getInventoryHistories(offset, limit);
+		return await this._inventoryService.getAllInventories(offset, limit);
 	}
 }
