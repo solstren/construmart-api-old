@@ -30,38 +30,25 @@ export class InventoryService {
 		};
 	}
 
-	async getAllInventoriesPaginated(page: number = 1, itemCount: number = 10): Promise<BaseResponse> {
-		try {
-			const inventories = await this._inventoryRepo.find({
+	async getAllInventories(page: number = 1, itemCount: number = 10): Promise<BaseResponse> {
+		const result: InventoryResponse[] = [];
+		let inventories: Inventory[] = [];
+		if (page <= 0 || itemCount <= 0) {
+			inventories = await this._inventoryRepo.find({
 				order: { id: 'ASC' },
 				loadEagerRelations: true,
 				relations: [ 'product' ],
 				take: itemCount,
 				skip: itemCount * (page - 1)
 			});
-			const result: InventoryResponse[] = [];
-			if (inventories.length > 0) {
-				inventories.forEach((inventory) => {
-					result.push(ObjectMapper.mapToInventoryResponse(inventory));
-				});
-			}
-			return {
-				status: true,
-				message: ResponseMessages.SUCCESS,
-				body: result
-			};
-		} catch (error) {
-			console.log(`error ==> ${error}`);
+		} else {
+			inventories = await this._inventoryRepo.find({
+				order: { id: 'ASC' },
+				loadEagerRelations: true,
+				relations: [ 'product' ]
+			});
 		}
-	}
 
-	async getAllInventories(): Promise<BaseResponse>{
-		const inventories = await this._inventoryRepo.find({
-			order: { id: 'ASC' },
-			loadEagerRelations: true,
-			relations: [ 'product' ]
-		});
-		const result: InventoryResponse[] = [];
 		if (inventories.length > 0) {
 			inventories.forEach((inventory) => {
 				result.push(ObjectMapper.mapToInventoryResponse(inventory));

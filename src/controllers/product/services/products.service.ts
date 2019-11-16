@@ -51,9 +51,15 @@ export class ProductsService {
 	}
 
 	async getAllProducts(page: number = 1, itemCount: number = 10): Promise<BaseResponse> {
-		let products: Product[];
+		let products: Product[] = [];
 		let productResponses: ProductResponse[] = [];
-		try {
+		if (page <= 0 || itemCount <= 0) {
+			products = await this._productRepo.find({
+				order: { name: 'ASC' },
+				loadEagerRelations: true,
+				relations: [ 'category' ]
+			});
+		} else {
 			products = await this._productRepo.find({
 				order: { name: 'ASC' },
 				loadEagerRelations: true,
@@ -61,15 +67,13 @@ export class ProductsService {
 				take: itemCount,
 				skip: itemCount * (page - 1)
 			});
-			if (products.length > 0) {
-				products.forEach((product) => {
-					let productResponse = ObjectMapper.mapToProductResponse(product);
-					productResponses.push(productResponse);
-				});
-			}
-		} catch (ex) {
-			Logger.log(ex);
-			throw new InternalServerErrorException(ex);
+		}
+
+		if (products.length > 0) {
+			products.forEach((product) => {
+				let productResponse = ObjectMapper.mapToProductResponse(product);
+				productResponses.push(productResponse);
+			});
 		}
 		return {
 			status: true,
@@ -123,7 +127,7 @@ export class ProductsService {
 		inventory.currentPrice = 0;
 		inventory.currentQuantity = 0;
 		inventory.product = product;
-		
+
 		const inventoryResult = await this._inventoryRepo.insertInventory(inventory);
 		// const result = ObjectMapper.mapToInventoryResponse(inventoryResult);
 		if (product.id <= 0) {
