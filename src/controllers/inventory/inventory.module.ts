@@ -5,7 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { InventoryController } from './inventory.controller';
 import { ProductModule } from '../product/products.module';
 import { ProductsRepository } from '../product/repositories/products.repository';
-import { InventoryHistoryRepository } from './repository/inventory-history.repository';
+import { InventoryHistoryRepository } from '../inventory-history/repositories/inventory-history.repository';
 
 @Module({
   controllers: [InventoryController],

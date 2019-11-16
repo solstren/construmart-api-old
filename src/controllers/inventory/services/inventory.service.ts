@@ -9,7 +9,7 @@ import { Product } from '../../../entities/product.entity';
 import { ResponseMessages } from '../../../utils/response-messages';
 import { InventoryRequestDto } from '../../../models/request-dto/inventory-request-dto';
 import { InventoryResponse } from '../../../models/response-dto/inventory-response-dto';
-import { InventoryHistoryRepository } from '../repository/inventory-history.repository';
+import { InventoryHistoryRepository } from '../../../controllers/inventory-history/repositories/inventory-history.repository';
 
 @Injectable()
 export class InventoryService {
@@ -30,7 +30,7 @@ export class InventoryService {
 		};
 	}
 
-	async getAllInventories(page: number = 1, itemCount: number = 10): Promise<BaseResponse> {
+	async getAllInventories(page: number, itemCount: number): Promise<BaseResponse> {
 		const result: InventoryResponse[] = [];
 		let inventories: Inventory[] = [];
 		if (page <= 0 || itemCount <= 0) {
@@ -84,27 +84,6 @@ export class InventoryService {
 			status: true,
 			message: ResponseMessages.UPDATE_INVENTORY_SUCCESS,
 			body: null
-		};
-	}
-
-	async getInventoryHistories(page: number = 1, itemCount: number = 10): Promise<BaseResponse> {
-		var inventoryHistories = await this._inventoryHistoryRepo.find({
-			loadEagerRelations: true,
-			relations: [ 'category' ],
-			take: itemCount,
-			skip: itemCount * (page - 1)
-		});
-		let inventoryHistoryResponses: InventoryResponse[] = [];
-		if (inventoryHistories.length > 0) {
-			inventoryHistories.forEach((inventoryHistory) => {
-				let inventoryHistoryResponse = ObjectMapper.mapToInventoryResponse(inventoryHistory);
-				inventoryHistoryResponses.push(inventoryHistoryResponse);
-			});
-		}
-		return {
-			status: true,
-			message: ResponseMessages.SUCCESS,
-			body: inventoryHistoryResponses
 		};
 	}
 }

@@ -16,6 +16,7 @@ import { MulterModule } from '@nestjs/platform-express';
 import { InventoryModule } from './controllers/inventory/inventory.module';
 import { InventoryController } from './controllers/inventory/inventory.controller';
 import { InventoryService } from './controllers/inventory/services/inventory.service';
+import { InventoryHistoryModule } from './controllers/inventory-history/inventory-history.module';
 
 @Module({
 	imports: [
@@ -24,7 +25,8 @@ import { InventoryService } from './controllers/inventory/services/inventory.ser
 		ConfigModule,
 		CategoriesModule,
 		ProductModule,
-		InventoryModule
+		InventoryModule,
+		InventoryHistoryModule
 	],
 	controllers: [ AppController ],
 	providers: [ AppService ]
