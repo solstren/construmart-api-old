@@ -2,7 +2,7 @@ import { Entity, Unique, Index, Column, OneToMany, OneToOne, JoinColumn } from '
 import { Product } from './product.entity';
 import { BaseEntity } from './base.entity';
 
-@Entity('inventory')
+@Entity('inventory_history')
 export class InventoryHistory extends BaseEntity {
 	@OneToOne((type) => Product, { eager: true })
 	@JoinColumn()
