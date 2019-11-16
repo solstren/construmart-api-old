@@ -42,14 +42,21 @@ export class CategoriesService {
 		};
 	}
 
-	async getAllCategories(page: number = 10, itemCount: number = 10): Promise<BaseResponse> {
-		let categories: Category[];
-		categories = await this._categoryRepo.find({
-			order: { name: 'ASC' },
-			loadRelationIds: true,
-			take: itemCount,
-			skip: itemCount * (page - 1)
-		});
+	async getAllCategories(page: number, itemCount: number): Promise<BaseResponse> {
+		let categories: Category[] = [];
+		if (page <= 0 || itemCount <= 0) {
+			categories = await this._categoryRepo.find({
+				order: { name: 'ASC' },
+				loadRelationIds: true,
+			});
+		} else {
+			categories = await this._categoryRepo.find({
+				order: { name: 'ASC' },
+				loadRelationIds: true,
+				take: itemCount,
+				skip: itemCount * (page - 1)
+			});
+		}
 		return {
 			status: true,
 			message: ResponseMessages.SUCCESS,
