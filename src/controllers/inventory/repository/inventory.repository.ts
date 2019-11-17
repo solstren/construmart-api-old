@@ -29,7 +29,7 @@ export class InventoryRepository extends Repository<Inventory> {
 	}
 
 	async updateInventory(inventory: Inventory, productId: number): Promise<boolean> {
-		const result = await this.createQueryBuilder('inventory')
+		const result = await this.createQueryBuilder()
 			.update(Inventory)
 			.set({
 				initialPrice: inventory.initialPrice,
@@ -37,7 +37,7 @@ export class InventoryRepository extends Repository<Inventory> {
 				currentPrice: inventory.currentPrice,
 				currentQuantity: inventory.currentQuantity
 			})
-			.where('inventory.product = :productId', { productId: productId })
+			.where('product_id = :productId', { productId: productId })
 			.execute();
 		return result.affected ? true : false;
 	}

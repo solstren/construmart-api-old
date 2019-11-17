@@ -5,7 +5,7 @@ import { BaseEntity } from './base.entity';
 @Entity('inventory')
 export class Inventory extends BaseEntity {
 	@OneToOne((type) => Product, { eager: true })
-	@JoinColumn()
+	@JoinColumn({name: 'product_id', referencedColumnName: 'id'})
 	product: Product;
 
 	@Column('int', { name: 'initial_quantity', nullable: false })

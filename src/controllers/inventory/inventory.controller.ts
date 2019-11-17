@@ -70,7 +70,7 @@ export class InventoryController {
 	@ApiInternalServerErrorResponse({
 		description: AppConstants.SWAGGER_500_DESCRIPTION
 	})
-	@Put('/:id')
+	@Put('/:productId')
 	async updateInventory(
 		@Param('productId', ParseIntPipe)
 		productId: number,
