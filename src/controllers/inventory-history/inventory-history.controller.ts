@@ -26,7 +26,7 @@ export class InventoryHistoryController {
 	@ApiInternalServerErrorResponse({
 		description: AppConstants.SWAGGER_500_DESCRIPTION
 	})
-	@Get('/history')
+	@Get()
 	async getAllInventoryHistory(
 		@Query('offset', ParseIntPipe)
 		offset: number,

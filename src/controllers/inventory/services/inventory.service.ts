@@ -39,7 +39,7 @@ export class InventoryService {
 				loadEagerRelations: true,
 				relations: [ 'product' ],
 				take: itemCount,
-				skip: itemCount * (page - 1)
+				skip: itemCount * ((page + 1) - 1)
 			});
 		} else {
 			inventories = await this._inventoryRepo.find({

@@ -1,6 +1,6 @@
 export class InventoryResponse {
     id: number;
-    initialQuatity: number;
+    initialQuantity: number;
     initialPrice: number;
     currentQuantity: number;
     currentPrice: number;
