@@ -44,7 +44,7 @@ export class CategoriesService {
 
 	async getAllCategories(page: number, itemCount: number): Promise<BaseResponse> {
 		let categories: Category[] = [];
-		if (page <= 0 || itemCount <= 0) {
+		if (itemCount < 0) {
 			categories = await this._categoryRepo.find({
 				order: { name: 'ASC' },
 				loadRelationIds: true,

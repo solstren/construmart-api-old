@@ -33,7 +33,7 @@ export class InventoryService {
 	async getAllInventories(page: number, itemCount: number): Promise<BaseResponse> {
 		const result: InventoryResponse[] = [];
 		let inventories: Inventory[] = [];
-		if (page <= 0 || itemCount <= 0) {
+		if (itemCount < 0) {
 			inventories = await this._inventoryRepo.find({
 				order: { id: 'ASC' },
 				loadEagerRelations: true,

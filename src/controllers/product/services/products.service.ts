@@ -53,7 +53,7 @@ export class ProductsService {
 	async getAllProducts(page: number, itemCount: number): Promise<BaseResponse> {
 		let products: Product[] = [];
 		let productResponses: ProductResponse[] = [];
-		if (page <= 0 || itemCount <= 0) {
+		if (itemCount < 0) {
 			products = await this._productRepo.find({
 				order: { name: 'ASC' },
 				loadEagerRelations: true,
