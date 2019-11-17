@@ -36,10 +36,14 @@ export class InventoryHistoryService {
 				inventoryHistoryResponses.push(inventoryHistoryResponse);
 			});
 		}
+		let count = await this._inventoryHistoryRepo.count();
 		return {
 			status: true,
 			message: ResponseMessages.SUCCESS,
-			body: inventoryHistoryResponses
+			body: {
+				inventoryHistory: inventoryHistoryResponses,
+				totalCount: count
+			}
 		};
 	}
 }

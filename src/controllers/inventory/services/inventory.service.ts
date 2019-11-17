@@ -54,10 +54,14 @@ export class InventoryService {
 				result.push(ObjectMapper.mapToInventoryResponse(inventory));
 			});
 		}
+		let count = await this._inventoryRepo.count();
 		return {
 			status: true,
 			message: ResponseMessages.SUCCESS,
-			body: result
+			body: {
+				inventory: result,
+				totalCount: count
+			}
 		};
 	}
 
