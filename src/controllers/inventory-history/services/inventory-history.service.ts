@@ -25,7 +25,7 @@ export class InventoryHistoryService {
 				loadEagerRelations: true,
 				relations: [ 'product' ],
 				take: itemCount,
-				skip: itemCount * (page - 1)
+				skip: itemCount * ((page + 1) - 1)
 			});
 		}
 

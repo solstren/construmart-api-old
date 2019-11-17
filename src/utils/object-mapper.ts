@@ -43,7 +43,7 @@ export class ObjectMapper {
 		return {
 			id: inventory.id,
 			initialPrice: inventory.initialPrice,
-			initialQuatity: inventory.initialQuatity,
+			initialQuantity: inventory.initialQuatity,
 			currentPrice: inventory.currentPrice,
 			currentQuantity: inventory.currentQuantity,
 			productId: inventory.product.id,

@@ -65,7 +65,7 @@ export class ProductsService {
 				loadEagerRelations: true,
 				relations: [ 'category' ],
 				take: itemCount,
-				skip: itemCount * (page - 1)
+				skip: itemCount * ((page + 1) - 1)
 			});
 		}
 

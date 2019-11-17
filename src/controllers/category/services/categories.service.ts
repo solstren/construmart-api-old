@@ -54,7 +54,7 @@ export class CategoriesService {
 				order: { name: 'ASC' },
 				loadRelationIds: true,
 				take: itemCount,
-				skip: itemCount * (page - 1)
+				skip: itemCount * ((page + 1) - 1)
 			});
 		}
 		return {
