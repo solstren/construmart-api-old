@@ -10,6 +10,7 @@ import { ResponseMessages } from '../../../utils/response-messages';
 import { InventoryRequestDto } from '../../../models/request-dto/inventory-request-dto';
 import { InventoryResponse } from '../../../models/response-dto/inventory-response-dto';
 import { InventoryHistoryRepository } from '../../../controllers/inventory-history/repositories/inventory-history.repository';
+import { InventoryHistory } from '../../../entities/inventory-history.entity';
 
 @Injectable()
 export class InventoryService {
@@ -67,6 +68,7 @@ export class InventoryService {
 
 	async updateInventory(request: InventoryRequestDto, prodcuctId: number): Promise<BaseResponse> {
 		var oldInventory = await this._inventoryRepo.getInventoryByProductId(prodcuctId);
+		console.log(`oldInentory => ${oldInventory}`);
 		if (!oldInventory) throw new NotFoundException('Product is not tracked in inventory');
 		const inventoryRequest: InventoryRequestDto = {
 			initialQuantity: oldInventory.currentQuantity,
@@ -77,12 +79,22 @@ export class InventoryService {
 		};
 		const inventory = ObjectMapper.MapToInventoryEntity(inventoryRequest);
 		const isUpdated = await this._inventoryRepo.updateInventory(inventory, prodcuctId);
+		console.log(`isUpdated => ${isUpdated}`)
 		if (!isUpdated) throw new HttpException(ResponseMessages.ERROR, HttpStatus.NOT_MODIFIED);
-		const isInventoryHistoryUpdated = await this._inventoryHistoryRepo.updateInventoryHistory(
-			oldInventory,
-			prodcuctId
-		);
-		if (!isInventoryHistoryUpdated)
+
+		let isInventoryHistoryUpdated = false;
+		let inventoryHistory: InventoryHistory;
+		const isInventoryHistoryExist = await this._inventoryHistoryRepo.hasInventoryHistory(prodcuctId);
+		if (isInventoryHistoryExist) {
+			isInventoryHistoryUpdated = await this._inventoryHistoryRepo.updateInventoryHistory(
+				oldInventory,
+				prodcuctId
+			);
+		}else{
+			inventoryHistory = await this._inventoryHistoryRepo.insertInventoryHistory(oldInventory);
+		}
+		console.log(`isInventoryHistoryUpdated => ${isInventoryHistoryUpdated}`);
+		if (!isInventoryHistoryUpdated && !inventoryHistory)
 			throw new HttpException(ResponseMessages.UPDATE_INVENTORY_HISTORY_FAILURE, HttpStatus.NOT_MODIFIED);
 		return {
 			status: true,
