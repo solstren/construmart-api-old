@@ -15,7 +15,7 @@ export class InventoryHistoryService {
 
 	async getInventoryHistories(page: number, itemCount: number): Promise<BaseResponse> {
 		let inventoryHistories: InventoryHistory[] = [];
-		if (page <= 0 || itemCount <= 0) {
+		if (itemCount < 0) {
 			inventoryHistories = await this._inventoryHistoryRepo.find({
 				loadEagerRelations: true,
 				relations: [ 'product' ]
