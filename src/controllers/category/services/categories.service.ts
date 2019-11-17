@@ -57,12 +57,13 @@ export class CategoriesService {
 				skip: itemCount * ((page + 1) - 1)
 			});
 		}
+		let count = await this._categoryRepo.count();
 		return {
 			status: true,
 			message: ResponseMessages.SUCCESS,
 			body: {
 				categories: categories,
-				totalCount: categories.length
+				totalCount: count
 			}
 		};
 	}

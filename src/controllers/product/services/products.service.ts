@@ -75,12 +75,13 @@ export class ProductsService {
 				productResponses.push(productResponse);
 			});
 		}
+		let count = await this._productRepo.count();
 		return {
 			status: true,
 			message: ResponseMessages.SUCCESS,
 			body: {
 				products: productResponses,
-				totalCount: productResponses.length
+				totalCount: count,
 			}
 		};
 	}
