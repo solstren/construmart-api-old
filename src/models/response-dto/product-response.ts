@@ -1,4 +1,5 @@
 import { CategoryResponseDto } from './category-response-dto';
+import { TagResponse } from './tag-response';
 export class ProductResponse {
     id: number;
     name: string;
@@ -9,4 +10,5 @@ export class ProductResponse {
     categoryId: number;
     dateCreated: Date;
     dateUpdated: Date;
+    tag: TagResponse;
 }

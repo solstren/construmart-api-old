@@ -161,11 +161,16 @@ export class ProductsService {
         var category = await this._categoryRepo.findOne(request.categoryId);
         if (!category) throw new UnprocessableEntityException(ResponseMessages.CATEGORY_DOES_NOT_EXIST);
 
-        product.name = request.name || product.name;
-        product.description = request.description || product.description;
-        product.price = request.price || product.price;
-        product.imageName = file ? file.filename : product.imageName;
+        product.name = request.name;
+        product.description = request.description;
+        product.price = request.price;
+        product.imageName = file ? file.filename : null;
         product.category = category;
+        if (request.tagId && request.tagId != 0) {
+            let tag = await this._tagsRepository.findOne(request.tagId);
+            product.tag = tag;
+        }
+
 
         const result: Product = await this._productRepo.save(product);
         if (!result) {

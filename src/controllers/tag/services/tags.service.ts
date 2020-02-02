@@ -26,13 +26,28 @@ export class TagsService {
         };
     }
 
+    async getTagById(id: number): Promise<BaseResponse> {
+        let tag: Tag;
+        let tagResponse: TagResponse;
+        tag = await this._tagRepository.findOne({ id: id });
+        if (!tag) {
+            throw new NotFoundException(`Tag with id '${id}' does not exist`);
+        }
+        tagResponse = ObjectMapper.mapToTagResponse(tag);
+        return {
+            status: true,
+            message: 'success',
+            body: tagResponse
+        };
+    }
+
     async getAllTags(): Promise<BaseResponse> {
         let tags: Tag[];
         let tagResponses: TagResponse[];
         tags = await this._tagRepository.find({ order: { name: 'ASC' } });
         if (tags.length > 0) {
-            tags.forEach((product) => {
-                let tagResponse = ObjectMapper.mapToTagResponse(product);
+            tags.forEach((tag) => {
+                let tagResponse = ObjectMapper.mapToTagResponse(tag);
                 tagResponses.push(tagResponse);
             });
         }

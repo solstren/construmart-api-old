@@ -33,6 +33,10 @@ export class ObjectMapper {
             name: product.name,
             price: product.price,
             description: product.description,
+            tag: {
+                id: product.tag.id,
+                name: product.tag.name
+            },
             imageName: product.imageName,
             categoryId: product.category.id,
             categoryName: product.category.name,
