@@ -16,6 +16,7 @@ import { BaseEntity } from './base.entity';
 import { Inventory } from './inventory.entity';
 import { InventoryHistory } from './inventory-history.entity';
 import { TaggedProduct } from './tagged-product.entity';
+import { Tag } from './tag.entity';
 
 @Entity('products')
 export class Product extends BaseEntity {
@@ -35,6 +36,6 @@ export class Product extends BaseEntity {
     @ManyToOne((type) => Category, (category) => category.products)
     category: Category;
 
-    @OneToMany(type => TaggedProduct, taggedProduct => taggedProduct.productId)
-    taggedProduct: TaggedProduct[];
+    @ManyToOne((type) => Tag, (tag) => tag.products)
+    tag: Tag;
 }

@@ -1,3 +1,4 @@
+import { Product } from './product.entity';
 import { Entity, Index, Column, OneToMany } from 'typeorm';
 import { BaseEntity } from "./base.entity";
 import { TaggedProduct } from './tagged-product.entity';
@@ -8,6 +9,6 @@ export class Tag extends BaseEntity {
     @Column({ type: 'varchar', nullable: false })
     name: string;
 
-    @OneToMany(type => TaggedProduct, taggedProduct => taggedProduct.tagId)
-    taggedProduct: TaggedProduct[];
+    @OneToMany((type) => Product, (product) => product.tag, { eager: true })
+    products: Product[];
 }
