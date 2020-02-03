@@ -1,3 +1,4 @@
+import { Tag } from './../../../entities/tag.entity';
 import { TagsRepository } from './../../tag/repositories/tags.repository';
 import {
     Injectable,
@@ -52,22 +53,43 @@ export class ProductsService {
         };
     }
 
-    async getAllProducts(page: number, itemCount: number): Promise<BaseResponse> {
+    async getAllProducts(page: number, itemCount: number, tagName: string): Promise<BaseResponse> {
         let products: Product[] = [];
         let productResponses: ProductResponse[] = [];
-        if (itemCount < 0) {
+        let tag: Tag;
+        if (tagName && itemCount < 0) {
+            tag = await this._tagsRepository.findOne({ where: { name: tagName } });
             products = await this._productRepo.find({
                 order: { name: 'ASC' },
                 loadEagerRelations: true,
-                relations: ['category']
+                relations: ['category'],
+                where: { tag: tag }
             });
-        } else {
+        }
+        else if (tagName && itemCount > 0) {
+            products = await this._productRepo.find({
+                order: { name: 'ASC' },
+                loadEagerRelations: true,
+                relations: ['category'],
+                where: { tag: tag },
+                take: itemCount,
+                skip: itemCount * ((page + 1) - 1)
+            });
+        }
+        else if (!tagName && itemCount > 0) {
             products = await this._productRepo.find({
                 order: { name: 'ASC' },
                 loadEagerRelations: true,
                 relations: ['category'],
                 take: itemCount,
                 skip: itemCount * ((page + 1) - 1)
+            });
+        }
+        else {
+            products = await this._productRepo.find({
+                order: { name: 'ASC' },
+                loadEagerRelations: true,
+                relations: ['category']
             });
         }
 
