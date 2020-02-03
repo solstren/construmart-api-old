@@ -4,10 +4,10 @@ import { AppConstants } from './utils/app-constants';
 
 @Controller(`${AppConstants.APP_BASE_URL}uploads`)
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+    constructor(private readonly appService: AppService) { }
 
-  @Get(':filename')
-	async serveCategoryImage(@Param('filename') filename, @Res() res): Promise<any>{
-		res.sendFile(filename, {root: 'uploads'});
-	}
+    @Get('/:filename')
+    async serveCategoryImage(@Param('filename') filename, @Res() res): Promise<any> {
+        res.sendFile(filename, { root: 'uploads' });
+    }
 }

@@ -1,11 +1,13 @@
+import { Tag } from './../../../entities/tag.entity';
+import { TagsRepository } from './../../tag/repositories/tags.repository';
 import {
-	Injectable,
-	NotFoundException,
-	InternalServerErrorException,
-	UnprocessableEntityException,
-	HttpException,
-	HttpStatus,
-	Logger
+    Injectable,
+    NotFoundException,
+    InternalServerErrorException,
+    UnprocessableEntityException,
+    HttpException,
+    HttpStatus,
+    Logger
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from '../../../entities/product.entity';
@@ -25,149 +27,181 @@ import { SortOrder } from '../../../models/request-dto/sort-order-enum';
 
 @Injectable()
 export class ProductsService {
-	constructor(
-		@InjectRepository(InventoryRepository) private readonly _inventoryRepo: InventoryRepository,
-		@InjectRepository(ProductsRepository) private readonly _productRepo: ProductsRepository,
-		@InjectRepository(CategoriesRepository) private readonly _categoryRepo: CategoriesRepository
-	) {}
+    constructor(
+        @InjectRepository(InventoryRepository) private readonly _inventoryRepo: InventoryRepository,
+        @InjectRepository(ProductsRepository) private readonly _productRepo: ProductsRepository,
+        @InjectRepository(CategoriesRepository) private readonly _categoryRepo: CategoriesRepository,
+        @InjectRepository(TagsRepository) private readonly _tagsRepository: TagsRepository
+    ) { }
 
-	async getProductById(id: number): Promise<BaseResponse> {
-		let product: Product;
-		let productResponse: ProductResponse;
-		try {
-			product = await this._productRepo.findOne(id, { loadEagerRelations: true, relations: [ 'category' ] });
-			if (!product) {
-				throw new NotFoundException(`Product with id '${id}' not found`);
-			}
-			productResponse = ObjectMapper.mapToProductResponse(product);
-		} catch (error) {
-			throw new InternalServerErrorException(ResponseMessages.ERROR);
-		}
-		return {
-			status: true,
-			message: 'success',
-			body: productResponse
-		};
-	}
+    async getProductById(id: number): Promise<BaseResponse> {
+        let product: Product;
+        let productResponse: ProductResponse;
+        try {
+            product = await this._productRepo.findOne(id, { loadEagerRelations: true, relations: ['category'] });
+            if (!product) {
+                throw new NotFoundException(`Product with id '${id}' not found`);
+            }
+            productResponse = ObjectMapper.mapToProductResponse(product);
+        } catch (error) {
+            throw new InternalServerErrorException(ResponseMessages.ERROR);
+        }
+        return {
+            status: true,
+            message: 'success',
+            body: productResponse
+        };
+    }
 
-	async getAllProducts(page: number, itemCount: number): Promise<BaseResponse> {
-		let products: Product[] = [];
-		let productResponses: ProductResponse[] = [];
-		if (itemCount < 0) {
-			products = await this._productRepo.find({
-				order: { name: 'ASC' },
-				loadEagerRelations: true,
-				relations: [ 'category' ]
-			});
-		} else {
-			products = await this._productRepo.find({
-				order: { name: 'ASC' },
-				loadEagerRelations: true,
-				relations: [ 'category' ],
-				take: itemCount,
-				skip: itemCount * ((page + 1) - 1)
-			});
-		}
+    async getAllProducts(page: number, itemCount: number, tagName: string): Promise<BaseResponse> {
+        let products: Product[] = [];
+        let productResponses: ProductResponse[] = [];
+        let tag: Tag;
+        if (tagName && itemCount < 0) {
+            tag = await this._tagsRepository.findOne({ where: { name: tagName } });
+            products = await this._productRepo.find({
+                order: { name: 'ASC' },
+                loadEagerRelations: true,
+                relations: ['category'],
+                where: { tag: tag }
+            });
+        }
+        else if (tagName && itemCount > 0) {
+            products = await this._productRepo.find({
+                order: { name: 'ASC' },
+                loadEagerRelations: true,
+                relations: ['category'],
+                where: { tag: tag },
+                take: itemCount,
+                skip: itemCount * ((page + 1) - 1)
+            });
+        }
+        else if (!tagName && itemCount > 0) {
+            products = await this._productRepo.find({
+                order: { name: 'ASC' },
+                loadEagerRelations: true,
+                relations: ['category'],
+                take: itemCount,
+                skip: itemCount * ((page + 1) - 1)
+            });
+        }
+        else {
+            products = await this._productRepo.find({
+                order: { name: 'ASC' },
+                loadEagerRelations: true,
+                relations: ['category']
+            });
+        }
 
-		if (products.length > 0) {
-			products.forEach((product) => {
-				let productResponse = ObjectMapper.mapToProductResponse(product);
-				productResponses.push(productResponse);
-			});
-		}
-		let count = await this._productRepo.count();
-		return {
-			status: true,
-			message: ResponseMessages.SUCCESS,
-			body: {
-				products: productResponses,
-				totalCount: count,
-			}
-		};
-	}
+        if (products.length > 0) {
+            products.forEach((product) => {
+                let productResponse = ObjectMapper.mapToProductResponse(product);
+                productResponses.push(productResponse);
+            });
+        }
+        let count = await this._productRepo.count();
+        return {
+            status: true,
+            message: ResponseMessages.SUCCESS,
+            body: {
+                products: productResponses,
+                totalCount: count,
+            }
+        };
+    }
 
-	async deleteProduct(id: number): Promise<BaseResponse> {
-		const product = await this._productRepo.findOne(id);
-		if (!product) {
-			throw new NotFoundException(`Product with id ${id} not found`);
-		}
-		await this._productRepo.remove(product);
-		const inventory = await this._inventoryRepo.getInventoryByProductId(product.id);
-		await this._inventoryRepo.remove(inventory);
-		return {
-			status: true,
-			message: ResponseMessages.SUCCESS,
-			body: null
-		};
-	}
+    async deleteProduct(id: number): Promise<BaseResponse> {
+        const product = await this._productRepo.findOne(id);
+        if (!product) {
+            throw new NotFoundException(`Product with id ${id} not found`);
+        }
+        await this._productRepo.remove(product);
+        const inventory = await this._inventoryRepo.getInventoryByProductId(product.id);
+        await this._inventoryRepo.remove(inventory);
+        return {
+            status: true,
+            message: ResponseMessages.SUCCESS,
+            body: null
+        };
+    }
 
-	async createProduct(productReq: ProductRequestDto, file: FileUploadRequest): Promise<BaseResponse> {
-		let product: Product;
-		// check if category exists
-		const duplicateCount = await this._productRepo.findAndCount({
-			where: { name: { value: productReq.name } }
-		});
+    async createProduct(productReq: ProductRequestDto, file: FileUploadRequest): Promise<BaseResponse> {
+        let product: Product;
+        // check if category exists
+        const duplicateCount = await this._productRepo.findAndCount({
+            where: { name: { value: productReq.name } }
+        });
 
-		if (duplicateCount[1] >= 1) {
-			throw new UnprocessableEntityException(ResponseMessages.CATEGORY_EXISTS);
-		}
-		var category = await this._categoryRepo.findOne(productReq.categoryId);
-		if (!category) throw new UnprocessableEntityException(ResponseMessages.CATEGORY_DOES_NOT_EXIST);
+        if (duplicateCount[1] >= 1) {
+            throw new UnprocessableEntityException(ResponseMessages.CATEGORY_EXISTS);
+        }
+        var category = await this._categoryRepo.findOne(productReq.categoryId);
+        if (!category) throw new UnprocessableEntityException(ResponseMessages.CATEGORY_DOES_NOT_EXIST);
 
-		product = new Product();
-		product.name = productReq.name;
-		product.imageName = file.filename || null;
-		product.description = productReq.description;
-		product.price = productReq.price;
-		product.category = category;
-		await this._productRepo.save(product);
+        product = new Product();
+        product.name = productReq.name;
+        product.imageName = file.filename || null;
+        product.description = productReq.description;
+        product.price = productReq.price;
+        product.category = category;
+        if (productReq.tagId && productReq.tagId != 0) {
+            let tag = await this._tagsRepository.findOne(productReq.tagId);
+            product.tag = tag;
+        }
+        await this._productRepo.save(product);
 
-		let inventory: Inventory = new Inventory();
-		inventory.initialPrice = 0;
-		inventory.initialQuatity = 0;
-		inventory.currentPrice = 0;
-		inventory.currentQuantity = 0;
-		inventory.product = product;
+        let inventory: Inventory = new Inventory();
+        inventory.initialPrice = 0;
+        inventory.initialQuatity = 0;
+        inventory.currentPrice = 0;
+        inventory.currentQuantity = 0;
+        inventory.product = product;
 
-		const inventoryResult = await this._inventoryRepo.insertInventory(inventory);
-		// const result = ObjectMapper.mapToInventoryResponse(inventoryResult);
-		if (product.id <= 0) {
-			throw new UnprocessableEntityException('Failed to create product');
-		}
+        const inventoryResult = await this._inventoryRepo.insertInventory(inventory);
 
-		return {
-			status: true,
-			message: ResponseMessages.CREATE_PRODUCT_SUCCESS,
-			body: product
-		};
-	}
+        // const result = ObjectMapper.mapToInventoryResponse(inventoryResult);
+        if (product.id <= 0) {
+            throw new UnprocessableEntityException('Failed to create product');
+        }
 
-	async updateProduct(
-		id: number,
-		file: FileUploadRequest,
-		request: Partial<ProductRequestDto>
-	): Promise<BaseResponse> {
-		const product = await this._productRepo.findOne(id);
-		if (!product) {
-			throw new NotFoundException(ResponseMessages.PRODUCT_DOES_NOT_EXIST);
-		}
-		var category = await this._categoryRepo.findOne(request.categoryId);
-		if (!category) throw new UnprocessableEntityException(ResponseMessages.CATEGORY_DOES_NOT_EXIST);
+        return {
+            status: true,
+            message: ResponseMessages.CREATE_PRODUCT_SUCCESS,
+            body: product
+        };
+    }
 
-		product.name = request.name || product.name;
-		product.description = request.description || product.description;
-		product.price = request.price || product.price;
-		product.imageName = file ? file.filename : product.imageName;
-		product.category = category;
+    async updateProduct(
+        id: number,
+        file: FileUploadRequest,
+        request: Partial<ProductRequestDto>
+    ): Promise<BaseResponse> {
+        const product = await this._productRepo.findOne(id);
+        if (!product) {
+            throw new NotFoundException(ResponseMessages.PRODUCT_DOES_NOT_EXIST);
+        }
+        var category = await this._categoryRepo.findOne(request.categoryId);
+        if (!category) throw new UnprocessableEntityException(ResponseMessages.CATEGORY_DOES_NOT_EXIST);
 
-		const result: Product = await this._productRepo.save(product);
-		if (!result) {
-			throw new HttpException(ResponseMessages.ERROR, HttpStatus.NOT_MODIFIED);
-		}
-		return {
-			status: true,
-			message: ResponseMessages.UPDATE_PRODUCT_SUCCESS,
-			body: null
-		};
-	}
+        product.name = request.name;
+        product.description = request.description;
+        product.price = request.price;
+        product.imageName = file ? file.filename : null;
+        product.category = category;
+        if (request.tagId && request.tagId != 0) {
+            let tag = await this._tagsRepository.findOne(request.tagId);
+            product.tag = tag;
+        }
+
+
+        const result: Product = await this._productRepo.save(product);
+        if (!result) {
+            throw new HttpException(ResponseMessages.ERROR, HttpStatus.NOT_MODIFIED);
+        }
+        return {
+            status: true,
+            message: ResponseMessages.UPDATE_PRODUCT_SUCCESS,
+            body: null
+        };
+    }
 }
