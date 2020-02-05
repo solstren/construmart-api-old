@@ -9,16 +9,17 @@ import { diskStorage } from 'multer';
 import { editFileName } from '../../utils/edit-filename';
 import { imageFileValidator } from '../../utils/image-validator';
 import { InventoryRepository } from '../inventory/repository/inventory.repository';
+import { TagsRepository } from '../tag/repositories/tags.repository';
 
 @Module({
-	controllers: [ ProductsController ],
-	imports: [
-		TypeOrmModule.forFeature([ ProductsRepository, CategoriesRepository, InventoryRepository]),
-		MulterModule.register({
-			storage: diskStorage({ filename: editFileName, destination: './uploads' }),
-			fileFilter: imageFileValidator
-		})
-	],
-	providers: [ ProductsService ]
+    controllers: [ProductsController],
+    imports: [
+        TypeOrmModule.forFeature([ProductsRepository, CategoriesRepository, InventoryRepository, TagsRepository]),
+        MulterModule.register({
+            storage: diskStorage({ filename: editFileName, destination: './uploads' }),
+            fileFilter: imageFileValidator
+        })
+    ],
+    providers: [ProductsService]
 })
-export class ProductModule {}
+export class ProductModule { }
