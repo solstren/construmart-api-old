@@ -84,7 +84,7 @@ export class ProductsController {
         @Query('limit', ParseIntPipe)
         offset: number,
         @Query('tag')
-        tag: string,
+        tag?: string,
     ): Promise<BaseResponse> {
         return await this._productService.getAllProducts(offset, limit, tag);
     }

@@ -28,15 +28,19 @@ export class ObjectMapper {
     }
 
     public static mapToProductResponse(product: Product): ProductResponse {
+        let tag: TagResponse;
+        if (product.tag) {
+            tag = {
+                id: product.tag.id,
+                name: product.tag.name
+            }
+        }
         return {
             id: product.id,
             name: product.name,
             price: product.price,
             description: product.description,
-            tag: {
-                id: product.tag.id,
-                name: product.tag.name
-            },
+            tag: tag,
             imageName: product.imageName,
             categoryId: product.category.id,
             categoryName: product.category.name,
