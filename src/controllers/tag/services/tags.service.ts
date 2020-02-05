@@ -43,7 +43,7 @@ export class TagsService {
 
     async getAllTags(): Promise<BaseResponse> {
         let tags: Tag[];
-        let tagResponses: TagResponse[];
+        let tagResponses: TagResponse[] = [];
         tags = await this._tagRepository.find({ order: { name: 'ASC' } });
         if (tags.length > 0) {
             tags.forEach((tag) => {
