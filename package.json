@@ -5,7 +5,8 @@
     "author": "",
     "license": "MIT",
     "engines": {
-        "node": "11.12.0"
+        "node": "11.12.0",
+        "npm": "6.11.3"
     },
     "scripts": {
         "prebuild": "rimraf dist",
