@@ -38,7 +38,7 @@ export class ProductsService {
         let product: Product;
         let productResponse: ProductResponse;
         try {
-            product = await this._productRepo.findOne(id, { loadEagerRelations: true, relations: ['category'] });
+            product = await this._productRepo.findOne(id, { loadEagerRelations: true, relations: ['category', 'tag'] });
             if (!product) {
                 throw new NotFoundException(`Product with id '${id}' not found`);
             }
@@ -62,7 +62,7 @@ export class ProductsService {
             products = await this._productRepo.find({
                 order: { name: 'ASC' },
                 loadEagerRelations: true,
-                relations: ['category'],
+                relations: ['category', 'tag'],
                 where: { tag: tag }
             });
         }
@@ -70,7 +70,7 @@ export class ProductsService {
             products = await this._productRepo.find({
                 order: { name: 'ASC' },
                 loadEagerRelations: true,
-                relations: ['category'],
+                relations: ['category', 'tag'],
                 where: { tag: tag },
                 take: itemCount,
                 skip: itemCount * ((page + 1) - 1)
@@ -80,7 +80,7 @@ export class ProductsService {
             products = await this._productRepo.find({
                 order: { name: 'ASC' },
                 loadEagerRelations: true,
-                relations: ['category'],
+                relations: ['category', 'tag'],
                 take: itemCount,
                 skip: itemCount * ((page + 1) - 1)
             });
@@ -89,7 +89,7 @@ export class ProductsService {
             products = await this._productRepo.find({
                 order: { name: 'ASC' },
                 loadEagerRelations: true,
-                relations: ['category']
+                relations: ['category', 'tag']
             });
         }
 
