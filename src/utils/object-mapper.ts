@@ -28,7 +28,7 @@ export class ObjectMapper {
     }
 
     public static mapToProductResponse(product: Product): ProductResponse {
-        let tag: TagResponse;
+        let tag: TagResponse = null;
         if (product.tag) {
             tag = {
                 id: product.tag.id,
