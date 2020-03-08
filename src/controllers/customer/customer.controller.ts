@@ -6,7 +6,7 @@ import { CustomerService } from './services/customer.service';
 import { CreateCustomerRequest } from './../../models/request-dto/create-customer-request-dto';
 import { AppConstants } from './../../utils/app-constants';
 import { BaseResponse } from './../../models/response-dto/base-response';
-import { ApiCreatedResponse, ApiBadRequestResponse, ApiUnprocessableEntityResponse, ApiInternalServerErrorResponse, ApiConsumes, ApiImplicitFile } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiBadRequestResponse, ApiUnprocessableEntityResponse, ApiInternalServerErrorResponse, ApiConsumes, ApiImplicitFile, ApiUseTags } from '@nestjs/swagger';
 import { Controller, Post, Body, UsePipes, UseFilters, UseInterceptors } from '@nestjs/common';
 
 @Controller(`${AppConstants.APP_BASE_URL}customer`)
@@ -18,6 +18,7 @@ export class CustomerController {
         private _customerService: CustomerService
     ) { }
 
+    @ApiUseTags(AppConstants.SWAGGER_CUSTOMER_TAG)
     @ApiCreatedResponse({
         type: BaseResponse,
         description: AppConstants.SWAGGER_201_DESCRIPTION
@@ -38,6 +39,7 @@ export class CustomerController {
         return await this._customerService.createCustomer(request);
     }
 
+    @ApiUseTags(AppConstants.SWAGGER_CUSTOMER_TAG)
     @ApiCreatedResponse({
         type: BaseResponse,
         description: AppConstants.SWAGGER_201_DESCRIPTION
@@ -53,7 +55,7 @@ export class CustomerController {
     @ApiInternalServerErrorResponse({
         description: AppConstants.SWAGGER_500_DESCRIPTION
     })
-    @Post()
+    @Post('/verify')
     async verifyCustomer(@Body() request: VerifyCustomerRequest): Promise<BaseResponse> {
         return await this._customerService.verifyCustomer(request);
     }
