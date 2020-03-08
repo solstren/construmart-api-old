@@ -1,5 +1,6 @@
 import { User } from './user.entity';
-import { Entity, BaseEntity, Column, Index, ManyToMany } from 'typeorm';
+import { Entity, Column, Index, ManyToMany } from 'typeorm';
+import { BaseEntity } from './base.entity';
 @Entity('customer')
 export class Role extends BaseEntity {
     @Index({ unique: true })
