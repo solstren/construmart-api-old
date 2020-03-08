@@ -1,5 +1,5 @@
 import { AppConstants } from './../utils/app-constants';
-import { Injectable, HttpService, Param } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 // const nodemailer = require('nodemailer')
 
@@ -8,7 +8,7 @@ export class NotificationService {
     /**construmart@email.com
      *F6D7DB1E02D1B05E03535810B5470AAFD407
      */
-    constructor(private readonly _httpService: HttpService) { }
+    constructor() { }
 
     async sendEmail(from: string, to: string, fromName: string, subject: string, body: string, htmlBody: string) {
         let testAccount = await nodemailer.createTestAccount();

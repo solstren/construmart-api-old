@@ -1,5 +1,6 @@
-import { BaseEntity, Entity, Column, OneToOne, JoinColumn } from 'typeorm';
+import { Entity, Column, OneToOne, JoinColumn } from 'typeorm';
 import { User } from './user.entity';
+import { BaseEntity } from './base.entity';
 
 @Entity('encrypted_code')
 export class EncryptedCode extends BaseEntity {
@@ -12,7 +13,7 @@ export class EncryptedCode extends BaseEntity {
     @Column({ type: 'int', nullable: true, default: null })
     purpose: EncryptionPurpose;
 
-    @Column({ type: 'datetime', nullable: true, default: null })
+    @Column({ type: 'date', nullable: true, default: null })
     expiry: Date;
 
     @OneToOne(type => User, user => user.encryptedCode)

@@ -1,5 +1,5 @@
 import { TagModule } from './controllers/tag/tag.module';
-import { Module, HttpModule } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { } from 'dotenv';
@@ -22,8 +22,7 @@ import { CustomerModule } from './controllers/customer/customer.module';
         InventoryHistoryModule,
         TagModule,
         UserModule,
-        CustomerModule,
-        HttpModule
+        CustomerModule
     ],
     controllers: [AppController],
     providers: [AppService]
