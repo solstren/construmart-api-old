@@ -8,7 +8,7 @@ import { UserRepository } from './../../user/repository/user.repository';
 import { CreateCustomerRequest } from './../../../models/request-dto/create-customer-request-dto';
 import { BaseResponse } from './../../../models/response-dto/base-response';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Injectable, UnprocessableEntityException, InternalServerErrorException, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable, UnprocessableEntityException, InternalServerErrorException, HttpException, HttpStatus, NotFoundException } from '@nestjs/common';
 import { CustomerRepository } from '../repositories/customer-repository';
 import { User } from '../../../entities/user.entity';
 import * as bcrypt from "bcrypt";
@@ -94,12 +94,19 @@ export class CustomerService {
     async verifyCustomer(request: VerifyCustomerRequest): Promise<BaseResponse> {
         //fetch user by email
         let user = await this._userRepository.findOne({ where: { email: request.email } });
+        if (user == null) {
+            throw new UnprocessableEntityException("Invalid user account");
+        }
         //fetch saved encrypted otp
         let savedEncryptedCode = await this._encryptedCodeRepo.findOne({ where: { user: user } });
+        if (savedEncryptedCode == null) {
+            throw new UnprocessableEntityException("Invalid user account");
+        }
         //encrypt incoming otp and compare encrypted
-        let encryptedOtp = await bcrypt.hashPassword(request.otp, savedEncryptedCode.salt) as string;
+        // let encryptedOtp = await bcrypt.hashPassword(request.otp, savedEncryptedCode.salt) as string;
         //compare otp
-        if (String(encryptedOtp) === savedEncryptedCode.code) {
+        const isEqual = await bcrypt.compare(request.otp, savedEncryptedCode.code);
+        if (isEqual) {
             //activate user
             user.isActive = true;
             user.isEmailConfirmed = true;
