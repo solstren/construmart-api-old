@@ -18,4 +18,10 @@ export class AppConstants {
 
     static ORDER_ASC = 'ASC';
     static ORDER_DESC = 'DESC';
+
+    //http urls
+    static ELASTIC_EMAIL_URL = 'api.elasticemail.com/mailer/send';
+    static ELASTIC_EMAIL_SMTP_HOST = 'smtp.elasticemail.com';
+    static ELASTIC_EMAIL_PORT = '2525';
+    static ELASTIC_EMAIL_USERNAME = 'construmart@email.com';
 }
