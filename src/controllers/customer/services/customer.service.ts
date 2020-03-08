@@ -28,7 +28,7 @@ export class CustomerService {
     ) { }
 
     async createCustomer(request: CreateCustomerRequest): Promise<BaseResponse> {
-        let isExist = this._userRepository.hasUser(request.email);
+        let isExist = await this._userRepository.hasUser(request.email);
         if (isExist) {
             throw new UnprocessableEntityException("Email has been taken");
         }
@@ -36,52 +36,54 @@ export class CustomerService {
         let otp = AppUtils.GenerateOtp()
         let expiry = new Date();
         expiry.setHours(expiry.getHours() + 2);
-        let encryptedCode = new EncryptedCode();
+        const encryptedCode = new EncryptedCode();
         encryptedCode.salt = await bcrypt.genSalt();
-        encryptedCode.code = await bcrypt.hashPassword(otp, encryptedCode.salt);
+        encryptedCode.code = await bcrypt.hash(otp, encryptedCode.salt);
         encryptedCode.expiry = expiry;
         encryptedCode.purpose = EncryptionPurpose.CUSTOMER_ONBOARDING;
         // this._encryptedCodeRepo.save(encryptedCode);
 
-        let user = new User();
+        const user = new User();
         user.email = request.email;
         user.isEmailConfirmed = false;
         user.isPhoneNumberConfirmed = false;
         user.isActive = false;
         user.phoneNumber = request.phoneNumber;
         user.securityStamp = await bcrypt.genSalt();
-        user.password = await bcrypt.hashPassword(request.password, user.securityStamp);
+        user.password = await bcrypt.hash(request.password, user.securityStamp);
         user.encryptedCode = encryptedCode;
         // this._userRepository.save(user);
-
-        let customer = new Customer();
-        customer.firstname = request.firstname;
-        customer.lastname = request.lastname;
-        customer.user = user;
-        // this._customerRepository.save(customer);
 
         try {
             await getManager().transaction(async transactionalEntityManager => {
                 await transactionalEntityManager.save(encryptedCode);
                 await transactionalEntityManager.save(user);
-                await transactionalEntityManager.save(customer);
+                // await transactionalEntityManager.save(customer);
                 // ...
             });
         } catch (error) {
             console.log(`Error while creating customer: ${error}`);
         }
 
+        // const customer = new Customer();
+        // customer.firstname = request.firstname;
+        // customer.lastname = request.lastname;
+        // customer.user = user;
+        // await this._customerRepository.save(customer);
+
         //send activation link to email
-        let from = AppConstants.ELASTIC_EMAIL_USERNAME;
+        let from = AppConstants.DOCUMENT_NAME;
         let to = user.email;
         let FromName = "Construmart";
         let subject = "Your Account Registration"
         let htmlbody = `<h4>Please use the one time password <b>${otp}</b> to activate your account</h4>`
-        this._notificationService.sendEmail(from, to, FromName, subject, null, htmlbody)
-            .catch(() => {
-                console.error("Error occurred while sending mail upon customer signup");
-                throw new InternalServerErrorException("Failed to send email");
-            });
+        try {
+            await this._notificationService.sendEmail(from, to, FromName, subject, null, htmlbody)
+        } catch (error) {
+            console.error("Error occurred while sending mail upon customer signup");
+            console.error;
+            throw new InternalServerErrorException("Failed to send email");
+        }
         return {
             status: true,
             message: 'Please complete your registration using the one time password sent to your email',

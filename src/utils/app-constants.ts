@@ -1,6 +1,7 @@
 export class AppConstants {
     // swagger constants
     static SWAGGER_DOC_TITLE = 'Construmart API';
+    static DOCUMENT_NAME = 'gabbygabbylexy@gmail.com'
     static SWAGGER_DOC_DESCRIPTION = 'Documentation for Construmart web service';
     static SWAGGER_API_VERSION = '1.0';
     static SWAGGER_ADMIN_TAG = 'Construmart Admin';
@@ -24,4 +25,5 @@ export class AppConstants {
     static ELASTIC_EMAIL_SMTP_HOST = 'smtp.elasticemail.com';
     static ELASTIC_EMAIL_PORT = '2525';
     static ELASTIC_EMAIL_USERNAME = 'construmart@email.com';
+    static SOMETHING = 'born@21031994'
 }
