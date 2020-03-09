@@ -36,13 +36,12 @@ export class NotificationService {
     }
 
     async sendMailUsingSendgrid(from: string, to: string, fromName: string, subject: string, body: string, htmlBody: string): Promise<void> {
-        console.log(`SENDGRID ==> ${process.env.SENDGRID_API_KEY}`);
         sgMail.setApiKey(process.env.SENDGRID_API_KEY);
         const msg = {
             to: to,
             from: from,
             subject: subject,
-            text: '',
+            text: body || subject,
             html: htmlBody,
         };
         try {
