@@ -1,6 +1,7 @@
 import { AppConstants } from './../utils/app-constants';
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, UnprocessableEntityException } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
+import * as sgMail from '@sendgrid/mail';
 // const nodemailer = require('nodemailer')
 
 @Injectable()
@@ -11,7 +12,7 @@ export class NotificationService {
      */
     constructor() { }
 
-    async sendEmail(from: string, to: string, fromName: string, subject: string, body: string, htmlBody: string): Promise<void> {
+    async sendEmailUsingNodeMailer(from: string, to: string, fromName: string, subject: string, body: string, htmlBody: string): Promise<void> {
         let testAccount = await nodemailer.createTestAccount();
         let transporter = nodemailer.createTransport({
             host: "smtp.gmail.com",
@@ -32,5 +33,26 @@ export class NotificationService {
         });
 
         console.log(`Message semt: ${info.messageId}`);
+    }
+
+    async sendMailUsingSendgrid(from: string, to: string, fromName: string, subject: string, body: string, htmlBody: string): Promise<void> {
+        console.log(`SENDGRID ==> ${process.env.SENDGRID_API_KEY}`);
+        sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+        const msg = {
+            to: to,
+            from: from,
+            subject: subject,
+            text: '',
+            html: htmlBody,
+        };
+        try {
+            let result = await sgMail.send(msg);
+            console.log(result[0]);
+            console.log(result[1]);
+        } catch (err) {
+            console.error(err.toString());
+            throw new UnprocessableEntityException('Failed to send email');
+        }
+        console.log(`Message sent`);
     }
 }
