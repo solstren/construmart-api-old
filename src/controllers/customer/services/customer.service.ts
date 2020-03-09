@@ -81,7 +81,7 @@ export class CustomerService {
             await this._notificationService.sendEmail(from, to, FromName, subject, null, htmlbody)
         } catch (error) {
             console.error("Error occurred while sending mail upon customer signup");
-            console.error;
+            console.error(`Error: ${error}`);
             throw new InternalServerErrorException("Failed to send email");
         }
         return {
