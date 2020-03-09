@@ -75,20 +75,14 @@ export class CustomerService {
         let from = AppConstants.DOCUMENT_NAME;
         let to = user.email;
         let FromName = "Construmart";
-        let subject = "Your Account Registration"
-        let htmlbody = `<h4>Please use the one time password <b>${otp}</b> to activate your account</h4>`
-        try {
-            await this._notificationService.sendEmail(from, to, FromName, subject, null, htmlbody)
-        } catch (error) {
-            console.error("Error occurred while sending mail upon customer signup");
-            console.error(`Error: ${error}`);
-            throw new InternalServerErrorException("Failed to send email");
-        }
+        let subject = "Your Account Registration";
+        let htmlbody = `<h4>Please use the one time password <b>${otp}</b> to activate your account</h4>`;
+        await this._notificationService.sendMailUsingSendgrid(from, to, FromName, subject, null, htmlbody);
         return {
             status: true,
             message: 'Please complete your registration using the one time password sent to your email',
             body: null
-        }
+        };
     }
 
     async verifyCustomer(request: VerifyCustomerRequest): Promise<BaseResponse> {
