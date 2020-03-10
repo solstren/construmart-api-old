@@ -35,7 +35,7 @@ export class NotificationService {
         console.log(`Message semt: ${info.messageId}`);
     }
 
-    async sendMailUsingSendgrid(from: string, to: string, fromName: string, subject: string, body: string, htmlBody: string): Promise<void> {
+    async sendEmailUsingSendgrid(from: string, to: string, fromName: string, subject: string, body: string, htmlBody: string): Promise<void> {
         sgMail.setApiKey(process.env.SENDGRID_API_KEY);
         const msg = {
             to: to,
