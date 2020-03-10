@@ -10,7 +10,7 @@ import { BaseResponse } from './../../../models/response-dto/base-response';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable, UnprocessableEntityException, InternalServerErrorException, HttpException, HttpStatus, NotFoundException } from '@nestjs/common';
 import { CustomerRepository } from '../repositories/customer-repository';
-import { User } from '../../../entities/user.entity';
+import { User, UserType } from '../../../entities/user.entity';
 import * as bcrypt from "bcrypt";
 import { v4 as uuidv4 } from 'uuid';
 import { Request } from 'express';
@@ -39,7 +39,7 @@ export class CustomerService {
         const encryptedCode = new EncryptedCode();
         encryptedCode.salt = await bcrypt.genSalt();
         encryptedCode.code = await bcrypt.hash(otp, encryptedCode.salt);
-        encryptedCode.expiry = expiry;
+        encryptedCode.expiry = expiry.toString();
         encryptedCode.purpose = EncryptionPurpose.CUSTOMER_ONBOARDING;
         // this._encryptedCodeRepo.save(encryptedCode);
 
@@ -52,24 +52,24 @@ export class CustomerService {
         user.securityStamp = await bcrypt.genSalt();
         user.password = await bcrypt.hash(request.password, user.securityStamp);
         user.encryptedCode = encryptedCode;
+        user.userType = UserType.CUSTOMER;
         // this._userRepository.save(user);
+
+        const customer = new Customer();
+        customer.firstname = request.firstname;
+        customer.lastname = request.lastname;
+        customer.user = user;
 
         try {
             await getManager().transaction(async transactionalEntityManager => {
                 await transactionalEntityManager.save(encryptedCode);
                 await transactionalEntityManager.save(user);
-                // await transactionalEntityManager.save(customer);
+                await transactionalEntityManager.save(customer);
                 // ...
             });
         } catch (error) {
             console.log(`Error while creating customer: ${error}`);
         }
-
-        // const customer = new Customer();
-        // customer.firstname = request.firstname;
-        // customer.lastname = request.lastname;
-        // customer.user = user;
-        // await this._customerRepository.save(customer);
 
         //send activation link to email
         let from = AppConstants.DOCUMENT_NAME;
@@ -77,7 +77,7 @@ export class CustomerService {
         let FromName = "Construmart";
         let subject = "Your Account Registration";
         let htmlbody = `<h4>Please use the one time password <b>${otp}</b> to activate your account</h4>`;
-        await this._notificationService.sendMailUsingSendgrid(from, to, FromName, subject, null, htmlbody);
+        await this._notificationService.sendEmailUsingSendgrid(from, to, FromName, subject, null, htmlbody);
         return {
             status: true,
             message: 'Please complete your registration using the one time password sent to your email',
@@ -96,30 +96,41 @@ export class CustomerService {
         if (savedEncryptedCode == null) {
             throw new UnprocessableEntityException("Invalid user account");
         }
-        //encrypt incoming otp and compare encrypted
-        // let encryptedOtp = await bcrypt.hashPassword(request.otp, savedEncryptedCode.salt) as string;
-        //compare otp
         const isEqual = await bcrypt.compare(request.otp, savedEncryptedCode.code);
-        if (isEqual) {
-            //activate user
-            user.isActive = true;
-            user.isEmailConfirmed = true;
-            try {
-                var updatedUser = await this._userRepository.save(user);
-            } catch (error) {
-                throw new HttpException(ResponseMessages.ERROR, HttpStatus.NOT_MODIFIED);
-            }
-            //return response
-            return {
-                body: null,
-                message: null,
-                status: true
-            }
+        var expiryDate = new Date(savedEncryptedCode.expiry);
+        var currentDate = new Date();
+        if (savedEncryptedCode.isUsed) {
+            throw new UnprocessableEntityException('invalid Otp');
         }
+        if (!isEqual) {
+            throw new UnprocessableEntityException('invalid Otp');
+        }
+        if (isEqual && (expiryDate.getTime() < currentDate.getTime())) {
+            throw new UnprocessableEntityException('OTP has expired. Please click on resend to generate a new OTP');
+        }
+        if (isEqual && savedEncryptedCode.purpose !== EncryptionPurpose.CUSTOMER_ONBOARDING) {
+            throw new UnprocessableEntityException('invalid OTP');
+        }
+        user.isActive = true;
+        user.isEmailConfirmed = true;
+        try {
+            var updatedUser = await this._userRepository.save(user);
+        } catch (error) {
+            throw new HttpException(ResponseMessages.ERROR, HttpStatus.NOT_MODIFIED);
+        }
+
+        savedEncryptedCode.isUsed = true
+        try {
+            var updatedCode = await this._encryptedCodeRepo.save(savedEncryptedCode);
+        } catch (error) {
+            throw new HttpException(ResponseMessages.ERROR, HttpStatus.NOT_MODIFIED);
+        }
+
+        //return response
         return {
             body: null,
-            message: 'Invalid OTP',
-            status: false
+            message: null,
+            status: true
         }
     }
 }

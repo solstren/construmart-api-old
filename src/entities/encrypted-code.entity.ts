@@ -13,8 +13,11 @@ export class EncryptedCode extends BaseEntity {
     @Column({ type: 'int', nullable: true, default: null })
     purpose: EncryptionPurpose;
 
-    @Column({ type: 'date', nullable: true, default: null })
-    expiry: Date;
+    @Column({ type: 'varchar', nullable: false })
+    expiry: string;
+
+    @Column({ type: 'boolean', nullable: false, default: false })
+    isUsed: Boolean;
 
     @OneToOne(type => User, user => user.encryptedCode)
     @JoinColumn() // specify inverse side as a second parameter
