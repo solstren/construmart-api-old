@@ -7,7 +7,7 @@ import { ObjectMapper } from '../../../utils/object-mapper';
 import { ProductsRepository } from '../../../controllers/product/repositories/products.repository';
 import { Product } from '../../../entities/product.entity';
 import { ResponseMessages } from '../../../utils/response-messages';
-import { InventoryRequestDto } from '../../../models/request-dto/inventory-request-dto';
+import { InventoryRequestDto } from '../../../models/request-dto/inventory-request.dto';
 import { InventoryResponse } from '../../../models/response-dto/inventory-response-dto';
 import { InventoryHistoryRepository } from '../../../controllers/inventory-history/repositories/inventory-history.repository';
 import { InventoryHistory } from '../../../entities/inventory-history.entity';

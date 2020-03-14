@@ -6,7 +6,7 @@ import { Product } from '../entities/product.entity';
 import { ProductResponse } from '../models/response-dto/product-response';
 import { InventoryResponse } from '../models/response-dto/inventory-response-dto';
 import { Inventory } from '../entities/inventory.entity';
-import { InventoryRequestDto } from '../models/request-dto/inventory-request-dto';
+import { InventoryRequestDto } from '../models/request-dto/inventory-request.dto';
 import { InventoryHistory } from '../entities/inventory-history.entity';
 
 export class ObjectMapper {

@@ -1,9 +1,9 @@
 import { LoggerInterceptor } from './../../shared/logger.interceptor';
 import { HttpErrorFilter } from './../../shared/http-error.filter';
 import { AppValidationPipe } from './../../shared/app-validation.pipe';
-import { VerifyCustomerRequest } from './../../models/request-dto/verify-customer-dto';
+import { VerifyCustomerRequest } from '../../models/request-dto/verify-customer.dto';
 import { CustomerService } from './services/customer.service';
-import { CreateCustomerRequest } from './../../models/request-dto/create-customer-request-dto';
+import { CreateCustomerRequest } from '../../models/request-dto/create-customer-request.dto';
 import { AppConstants } from './../../utils/app-constants';
 import { BaseResponse } from './../../models/response-dto/base-response';
 import { ApiCreatedResponse, ApiBadRequestResponse, ApiUnprocessableEntityResponse, ApiInternalServerErrorResponse, ApiConsumes, ApiImplicitFile, ApiUseTags } from '@nestjs/swagger';

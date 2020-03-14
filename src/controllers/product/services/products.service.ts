@@ -14,7 +14,7 @@ import { Product } from '../../../entities/product.entity';
 import { ProductsRepository } from '../repositories/products.repository';
 import { BaseResponse } from '../../../models/response-dto/base-response';
 import { ResponseMessages } from '../../../utils/response-messages';
-import { ProductRequestDto } from '../../../models/request-dto/product-request-dto';
+import { ProductRequestDto } from '../../../models/request-dto/product-request.dto';
 import { FileUploadRequest } from '../../../models/request-dto/file-upload-request';
 import { UpdateResult } from 'typeorm';
 import { CategoriesRepository } from '../../../controllers/category/repositories/categories.repository';

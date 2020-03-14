@@ -38,6 +38,6 @@ export class User extends BaseEntity {
 }
 
 export enum UserType {
-    ADMIN,
+    ADMIN = 1,
     CUSTOMER
 }
