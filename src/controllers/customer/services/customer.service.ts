@@ -1,11 +1,11 @@
 import { ResponseMessages } from './../../../utils/response-messages';
-import { VerifyCustomerRequest } from './../../../models/request-dto/verify-customer-dto';
+import { VerifyCustomerRequest } from '../../../models/request-dto/verify-customer.dto';
 import { AppUtils } from './../../../utils/app-utils';
 import { AppConstants } from './../../../utils/app-constants';
 import { NotificationService } from './../../../core/notification.service';
 import { Customer } from './../../../entities/customer.entity';
 import { UserRepository } from './../../user/repository/user.repository';
-import { CreateCustomerRequest } from './../../../models/request-dto/create-customer-request-dto';
+import { CreateCustomerRequest } from '../../../models/request-dto/create-customer-request.dto';
 import { BaseResponse } from './../../../models/response-dto/base-response';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable, UnprocessableEntityException, InternalServerErrorException, HttpException, HttpStatus, NotFoundException } from '@nestjs/common';

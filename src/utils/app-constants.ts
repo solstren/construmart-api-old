@@ -5,6 +5,7 @@ export class AppConstants {
     static SWAGGER_DOC_DESCRIPTION = 'Documentation for Construmart web service';
     static SWAGGER_API_VERSION = '1.0';
     static SWAGGER_ADMIN_TAG = 'Construmart Admin';
+    static SWAGGER_USER_TAG = 'User';
     static SWAGGER_ADMIN_TAG_DESCRIPTION = 'These are documented endpoints specific to the administrative role of the service';
     static SWAGGER_CUSTOMER_TAG = 'Construmart Customer';
     static SWAGGER_CUSTOMER_TAG_DESCRIPTION = 'These are documented endpoints specific to the customer role of the service';
@@ -16,6 +17,7 @@ export class AppConstants {
     static SWAGGER_422_DESCRIPTION = 'An error occured while creating category';
     static SWAGGER_304_DESCRIPTION = 'Failed to update data';
     static SWAGGER_404_DESCRIPTION = 'Data does not exist';
+    static SWAGGER_401_DESCRIPTION = 'Unauthorized';
 
     static ORDER_ASC = 'ASC';
     static ORDER_DESC = 'DESC';
