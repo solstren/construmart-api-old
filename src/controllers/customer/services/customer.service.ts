@@ -9,7 +9,7 @@ import { UserRepository } from './../../user/repository/user.repository';
 import { CreateCustomerRequest } from '../../../models/request-dto/create-customer-request.dto';
 import { BaseResponse } from './../../../models/response-dto/base-response';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Injectable, UnprocessableEntityException, InternalServerErrorException, HttpException, HttpStatus, NotFoundException } from '@nestjs/common';
+import { Injectable, UnprocessableEntityException, InternalServerErrorException, HttpException, HttpStatus, NotFoundException, Logger } from '@nestjs/common';
 import { CustomerRepository } from '../repositories/customer-repository';
 import { User, UserType } from '../../../entities/user.entity';
 import * as bcrypt from "bcrypt";
@@ -30,8 +30,14 @@ export class CustomerService {
     ) { }
 
     async createCustomer(request: CreateCustomerRequest): Promise<BaseResponse> {
-        let isExist = await this._userRepository.hasUser(request.email);
-        let user = await this._userRepository.findOne({ where: { email: request.email } });
+        let user = null;
+        try {
+            user = await this._userRepository.findOne({ where: { email: request.email } });
+        } catch (error) {
+            Logger.error(`ERROR_CustomerService.verifyCustomer: Error fetching user ${error}`);
+            throw new InternalServerErrorException(ResponseMessages.ERROR);
+        }
+
         if (!user || !user.isActive) {
             throw new UnprocessableEntityException("Email has been taken");
         }
@@ -49,7 +55,6 @@ export class CustomerService {
         user.password = await bcrypt.hash(request.password, await bcrypt.genSalt());
         user.encryptedCode = encryptedCode;
         user.userType = UserType.CUSTOMER;
-        // this._userRepository.save(user);
 
         const customer = new Customer();
         customer.firstname = request.firstname;
@@ -83,12 +88,25 @@ export class CustomerService {
 
     async verifyCustomer(request: VerifyCustomerRequest): Promise<BaseResponse> {
         //fetch user by email
-        let user = await this._userRepository.findOne({ where: { email: request.email } });
+        let user = null;
+        try {
+            user = await this._userRepository.findOne({ where: { email: request.email } });
+        } catch (error) {
+            Logger.error(`ERROR_CustomerService.verifyCustomer: Error fetching user ${error}`);
+            throw new InternalServerErrorException(ResponseMessages.ERROR);
+        }
+
         if (user == null) {
             throw new UnprocessableEntityException("Invalid user account");
         }
         //fetch saved encrypted otp
-        let savedEncryptedCode = await this._encryptedCodeRepo.findOne({ where: { user: user } });
+        let savedEncryptedCode = null;
+        try {
+            savedEncryptedCode = await this._encryptedCodeRepo.findOne({ where: { user: user } });
+        } catch (error) {
+            Logger.error(`ERROR_CustomerService.verifyCustomer: Error fetching encryption code ${error}`);
+            throw new InternalServerErrorException(ResponseMessages.ERROR);
+        }
         await this._userService.VerifyOtp(savedEncryptedCode, request.otp);
         user.isActive = true;
         user.isEmailConfirmed = true;
@@ -100,7 +118,7 @@ export class CustomerService {
                 // ...
             });
         } catch (error) {
-            console.log(`Error while verifying customer otp: ${error}`);
+            Logger.error(`ERROR_CustomerService.verifyCustomer: Error while verifying customer otp: ${error}`);
             throw new HttpException(ResponseMessages.ERROR, HttpStatus.NOT_MODIFIED);
         }
 

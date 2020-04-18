@@ -5,6 +5,8 @@ import { Module } from '@nestjs/common';
 import { UserService } from './services/user.service';
 import { JwtModule } from '@nestjs/jwt';
 import { UserController } from './user.controller';
+import * as dotenv from 'dotenv';
+dotenv.config({ debug: true });
 
 @Module({
     controllers: [UserController],
