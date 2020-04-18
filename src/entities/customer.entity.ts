@@ -11,6 +11,6 @@ export class Customer extends BaseEntity {
     lastname: string;
 
     @OneToOne(type => User, user => user.customer)
-    @JoinColumn() // specify inverse side as a second parameter
+    @JoinColumn({ name: "user_id", referencedColumnName: 'id' }) // specify inverse side as a second parameter
     user: User;
 }

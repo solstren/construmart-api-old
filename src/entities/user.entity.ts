@@ -12,22 +12,19 @@ export class User extends BaseEntity {
     @Column({ type: 'varchar' })
     password: string;
 
-    @Column({ type: 'boolean', nullable: false, default: false })
+    @Column({ name: "is_active", type: 'boolean', nullable: false, default: false })
     isActive: boolean;
 
-    @Column({ type: 'varchar' })
+    @Column({ name: "phone_number", type: 'varchar' })
     phoneNumber: string;
 
-    @Column({ type: 'boolean', nullable: false, default: false })
+    @Column({ name: "is_email_confirmed", type: 'boolean', nullable: false, default: false })
     isEmailConfirmed: boolean;
 
-    @Column({ type: 'boolean', nullable: false, default: false })
+    @Column({ name: "is_phone_number_confirmed", type: 'boolean', nullable: false, default: false })
     isPhoneNumberConfirmed: boolean;
 
-    @Column({ type: 'varchar', nullable: false, default: false })
-    securityStamp: string;
-
-    @Column({ type: 'int', nullable: false })
+    @Column({ name: "user_type", type: 'int', nullable: false })
     userType: UserType;
 
     @OneToOne(type => Customer, customer => customer.user) // specify inverse side as a second parameter

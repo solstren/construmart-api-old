@@ -7,20 +7,17 @@ export class EncryptedCode extends BaseEntity {
     @Column({ type: 'varchar', nullable: true, default: null })
     code: string;
 
-    @Column({ type: 'varchar', nullable: true, default: null })
-    salt: string;
-
     @Column({ type: 'int', nullable: true, default: null })
     purpose: EncryptionPurpose;
 
     @Column({ type: 'varchar', nullable: false })
     expiry: string;
 
-    @Column({ type: 'boolean', nullable: false, default: false })
+    @Column({ name: "is_used", type: 'boolean', nullable: false, default: false })
     isUsed: Boolean;
 
     @OneToOne(type => User, user => user.encryptedCode)
-    @JoinColumn() // specify inverse side as a second parameter
+    @JoinColumn({ name: "user_id", referencedColumnName: 'id' }) // specify inverse side as a second parameter
     user: User;
 }
 
