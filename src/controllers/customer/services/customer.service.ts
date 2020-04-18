@@ -1,3 +1,4 @@
+import { UserService } from './../../user/services/user.service';
 import { ResponseMessages } from './../../../utils/response-messages';
 import { VerifyCustomerRequest } from '../../../models/request-dto/verify-customer.dto';
 import { AppUtils } from './../../../utils/app-utils';
@@ -24,33 +25,28 @@ export class CustomerService {
         @InjectRepository(CustomerRepository) private readonly _customerRepository: CustomerRepository,
         @InjectRepository(UserRepository) private readonly _userRepository: UserRepository,
         @InjectRepository(EncryptedCodeRepository) private readonly _encryptedCodeRepo: EncryptedCodeRepository,
-        private readonly _notificationService: NotificationService
+        private readonly _notificationService: NotificationService,
+        private readonly _userService: UserService
     ) { }
 
     async createCustomer(request: CreateCustomerRequest): Promise<BaseResponse> {
         let isExist = await this._userRepository.hasUser(request.email);
-        if (isExist) {
+        let user = await this._userRepository.findOne({ where: { email: request.email } });
+        if (!user || !user.isActive) {
             throw new UnprocessableEntityException("Email has been taken");
         }
         // Generate otp and assign it to user
         let otp = AppUtils.GenerateOtp()
-        let expiry = new Date();
-        expiry.setHours(expiry.getHours() + 2);
-        const encryptedCode = new EncryptedCode();
-        encryptedCode.salt = await bcrypt.genSalt();
-        encryptedCode.code = await bcrypt.hash(otp, encryptedCode.salt);
-        encryptedCode.expiry = expiry.toString();
-        encryptedCode.purpose = EncryptionPurpose.CUSTOMER_ONBOARDING;
+        const encryptedCode = await this._userService.generateOtp(request.email, otp, EncryptionPurpose.CUSTOMER_ONBOARDING);
         // this._encryptedCodeRepo.save(encryptedCode);
 
-        const user = new User();
+        user = new User();
         user.email = request.email;
         user.isEmailConfirmed = false;
         user.isPhoneNumberConfirmed = false;
         user.isActive = false;
         user.phoneNumber = request.phoneNumber;
-        user.securityStamp = await bcrypt.genSalt();
-        user.password = await bcrypt.hash(request.password, user.securityStamp);
+        user.password = await bcrypt.hash(request.password, await bcrypt.genSalt());
         user.encryptedCode = encryptedCode;
         user.userType = UserType.CUSTOMER;
         // this._userRepository.save(user);
@@ -77,7 +73,7 @@ export class CustomerService {
         let FromName = "Construmart";
         let subject = "Your Account Registration";
         let htmlbody = `<h4>Please use the one time password <b>${otp}</b> to activate your account</h4>`;
-        await this._notificationService.sendEmailUsingSendgrid(from, to, FromName, subject, null, htmlbody);
+        await this._notificationService.sendEmailUsingNodeMailer(from, to, FromName, subject, null, htmlbody);
         return {
             status: true,
             message: 'Please complete your registration using the one time password sent to your email',
@@ -93,36 +89,18 @@ export class CustomerService {
         }
         //fetch saved encrypted otp
         let savedEncryptedCode = await this._encryptedCodeRepo.findOne({ where: { user: user } });
-        if (savedEncryptedCode == null) {
-            throw new UnprocessableEntityException("Invalid user account");
-        }
-        const isEqual = await bcrypt.compare(request.otp, savedEncryptedCode.code);
-        var expiryDate = new Date(savedEncryptedCode.expiry);
-        var currentDate = new Date();
-        if (savedEncryptedCode.isUsed) {
-            throw new UnprocessableEntityException('invalid Otp');
-        }
-        if (!isEqual) {
-            throw new UnprocessableEntityException('invalid Otp');
-        }
-        if (isEqual && (expiryDate.getTime() < currentDate.getTime())) {
-            throw new UnprocessableEntityException('OTP has expired. Please click on resend to generate a new OTP');
-        }
-        if (isEqual && savedEncryptedCode.purpose !== EncryptionPurpose.CUSTOMER_ONBOARDING) {
-            throw new UnprocessableEntityException('invalid OTP');
-        }
+        await this._userService.VerifyOtp(savedEncryptedCode, request.otp);
         user.isActive = true;
         user.isEmailConfirmed = true;
-        try {
-            var updatedUser = await this._userRepository.save(user);
-        } catch (error) {
-            throw new HttpException(ResponseMessages.ERROR, HttpStatus.NOT_MODIFIED);
-        }
 
-        savedEncryptedCode.isUsed = true
         try {
-            var updatedCode = await this._encryptedCodeRepo.save(savedEncryptedCode);
+            await getManager().transaction(async transactionalEntityManager => {
+                await transactionalEntityManager.save(savedEncryptedCode);
+                await transactionalEntityManager.save(user);
+                // ...
+            });
         } catch (error) {
+            console.log(`Error while verifying customer otp: ${error}`);
             throw new HttpException(ResponseMessages.ERROR, HttpStatus.NOT_MODIFIED);
         }
 

@@ -20,6 +20,7 @@ import { UserController } from './user.controller';
             }
         }),
         TypeOrmModule.forFeature([UserRepository, EncryptedCodeRepository])
-    ]
+    ],
+    exports: [UserService]
 })
 export class UserModule { }

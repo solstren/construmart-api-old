@@ -15,7 +15,6 @@ import {
 import { BaseEntity } from './base.entity';
 import { Inventory } from './inventory.entity';
 import { InventoryHistory } from './inventory-history.entity';
-import { TaggedProduct } from './tagged-product.entity';
 import { Tag } from './tag.entity';
 
 @Entity('products')
@@ -37,5 +36,6 @@ export class Product extends BaseEntity {
     category: Category;
 
     @ManyToOne((type) => Tag, (tag) => tag.products)
+    @JoinColumn({ name: "tag_id", referencedColumnName: 'id' })
     tag: Tag;
 }

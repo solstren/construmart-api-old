@@ -5,26 +5,29 @@ import { Logger } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { } from 'module';
 import * as compression from 'compression';
+import * as dotenv from 'dotenv';
 
 async function bootstrap() {
-  const port = process.env.PORT || 3000;
-  const app = await NestFactory.create(AppModule);
+    dotenv.config({ debug: true });
 
-  // Swagger config
-  const swaggerConfig = new DocumentBuilder()
-    .setTitle(AppConstants.SWAGGER_DOC_TITLE)
-    .setDescription(AppConstants.SWAGGER_DOC_DESCRIPTION)
-    .setVersion(AppConstants.SWAGGER_API_VERSION)
-    .addTag(AppConstants.SWAGGER_ADMIN_TAG, AppConstants.SWAGGER_ADMIN_TAG_DESCRIPTION)
-    .addTag(AppConstants.SWAGGER_CUSTOMER_TAG, AppConstants.SWAGGER_CUSTOMER_TAG_DESCRIPTION)
-    .setSchemes('https', 'http')
-    .build();
-  const swaggerDoc = SwaggerModule.createDocument(app, swaggerConfig);
-  SwaggerModule.setup('', app, swaggerDoc);
+    const port = process.env.PORT || 3000;
+    const app = await NestFactory.create(AppModule);
 
-  app.enableCors();
-  app.use(compression())
-  await app.listen(port);
-  Logger.log(`App started at port => ${port}`);
+    // Swagger config
+    const swaggerConfig = new DocumentBuilder()
+        .setTitle(AppConstants.SWAGGER_DOC_TITLE)
+        .setDescription(AppConstants.SWAGGER_DOC_DESCRIPTION)
+        .setVersion(AppConstants.SWAGGER_API_VERSION)
+        .addTag(AppConstants.SWAGGER_ADMIN_TAG, AppConstants.SWAGGER_ADMIN_TAG_DESCRIPTION)
+        .addTag(AppConstants.SWAGGER_CUSTOMER_TAG, AppConstants.SWAGGER_CUSTOMER_TAG_DESCRIPTION)
+        .setSchemes('https', 'http')
+        .build();
+    const swaggerDoc = SwaggerModule.createDocument(app, swaggerConfig);
+    SwaggerModule.setup('', app, swaggerDoc);
+
+    app.enableCors();
+    app.use(compression())
+    await app.listen(port);
+    Logger.log(`App started at port => ${port}`);
 }
 bootstrap();

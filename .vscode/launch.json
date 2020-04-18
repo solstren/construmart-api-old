@@ -9,14 +9,14 @@
             "args": [
                 "${workspaceFolder}/src/main.ts"
             ],
-            "env": {
-                "DB_TYPE": "postgres",
-                "DB_HOST": "salt.db.elephantsql.com",
-                "DB_PORT": "5432",
-                "DB_USER": "wthiwojl",
-                "DB_PASSWORD": "Ow5WPY6EuM-XQmLCNf1kG4F3h4bP4jus",
-                "DB_NAME": "wthiwojl"
-            },
+            // "env": {
+            //     "DB_TYPE": "postgres",
+            //     "DB_HOST": "salt.db.elephantsql.com",
+            //     "DB_PORT": "5432",
+            //     "DB_USER": "wthiwojl",
+            //     "DB_PASSWORD": "Ow5WPY6EuM-XQmLCNf1kG4F3h4bP4jus",
+            //     "DB_NAME": "wthiwojl"
+            // },
             "runtimeArgs": [
                 "--nolazy",
                 "-r",

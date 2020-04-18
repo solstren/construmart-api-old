@@ -1,3 +1,4 @@
+import { UserModule } from './../user/user.module';
 import { CoreModule } from './../../core/core.module';
 import { CustomerRepository } from './repositories/customer-repository';
 import { EncryptedCodeRepository } from './../user/repository/encrypted-code.repository';
@@ -11,6 +12,6 @@ import { TypeOrmModule } from '@nestjs/typeorm/dist/typeorm.module';
 @Module({
     providers: [CustomerService],
     controllers: [CustomerController],
-    imports: [CoreModule, TypeOrmModule.forFeature([UserRepository, CustomerRepository, EncryptedCodeRepository])]
+    imports: [CoreModule, UserModule, TypeOrmModule.forFeature([UserRepository, CustomerRepository, EncryptedCodeRepository])]
 })
 export class CustomerModule { }
