@@ -8,6 +8,6 @@ export class Tag extends BaseEntity {
     @Column({ type: 'varchar', nullable: false })
     name: string;
 
-    @OneToMany((type) => Product, (product) => product.tag, { eager: true })
+    @OneToMany((type) => Product, (product) => product.tag, { eager: true, onDelete: "CASCADE" })
     products: Product[];
 }

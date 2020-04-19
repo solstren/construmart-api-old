@@ -33,6 +33,12 @@ export class HttpErrorFilter implements ExceptionFilter {
             case HttpStatus.UNAUTHORIZED:
                 errorMsg = 'Invalid user credentials. Please provide valid credentials';
                 break;
+            case HttpStatus.NOT_FOUND:
+                errorMsg = 'Entity does not exist';
+                break;
+            case HttpStatus.UNPROCESSABLE_ENTITY:
+                errorMsg = 'Request could not be processed. Please try again';
+                break;
             default:
                 errorMsg = ResponseMessages.ERROR;
                 break;

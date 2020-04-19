@@ -4,19 +4,19 @@ import { BaseEntity } from './base.entity';
 
 @Entity('inventory')
 export class Inventory extends BaseEntity {
-	@OneToOne((type) => Product, { eager: true })
-	@JoinColumn({name: 'product_id', referencedColumnName: 'id'})
-	product: Product;
+    @OneToOne((type) => Product, { eager: true, onDelete: "CASCADE" })
+    @JoinColumn({ name: 'product_id', referencedColumnName: 'id' })
+    product: Product;
 
-	@Column('int', { name: 'initial_quantity', nullable: false })
-	initialQuatity: number;
+    @Column('int', { name: 'initial_quantity', nullable: false })
+    initialQuatity: number;
 
-	@Column('decimal', { default: 0.0, name: 'initial_price' })
-	initialPrice: number;
+    @Column('decimal', { default: 0.0, name: 'initial_price' })
+    initialPrice: number;
 
-	@Column('int', { name: 'current_quantity', nullable: false })
-	currentQuantity: number;
+    @Column('int', { name: 'current_quantity', nullable: false })
+    currentQuantity: number;
 
-	@Column('decimal', { default: 0.0, name: 'current_price' })
-	currentPrice: number;
+    @Column('decimal', { default: 0.0, name: 'current_price' })
+    currentPrice: number;
 }
