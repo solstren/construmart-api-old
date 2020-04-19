@@ -8,7 +8,7 @@ export class EncryptedCode extends BaseEntity {
     code: string;
 
     @Column({ type: 'int', nullable: true, default: null })
-    purpose: EncryptionPurpose;
+    purpose: EncryptionCodePurpose;
 
     @Column({ type: 'varchar', nullable: false })
     expiry: string;
@@ -16,12 +16,12 @@ export class EncryptedCode extends BaseEntity {
     @Column({ name: "is_used", type: 'boolean', nullable: false, default: false })
     isUsed: Boolean;
 
-    @OneToOne(type => User, user => user.encryptedCode)
+    @OneToOne(type => User, user => user.encryptedCode, { onDelete: "CASCADE" })
     @JoinColumn({ name: "user_id", referencedColumnName: 'id' }) // specify inverse side as a second parameter
     user: User;
 }
 
-export enum EncryptionPurpose {
+export enum EncryptionCodePurpose {
     CUSTOMER_ONBOARDING = 1,
-    FORGOT_PASSWORD
+    PASSWORD_RESET
 }

@@ -1,5 +1,6 @@
+import { ResponseMessages } from './../utils/response-messages';
 import { AppConstants } from './../utils/app-constants';
-import { Injectable, InternalServerErrorException, UnprocessableEntityException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, UnprocessableEntityException, Logger } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 import * as sgMail from '@sendgrid/mail';
 // const nodemailer = require('nodemailer')
@@ -24,15 +25,19 @@ export class NotificationService {
             }
         });
 
-        let info = await transporter.sendMail({
-            from: `"${fromName}" <${from}>`, // sender address
-            to: `${to}`, // list of receivers
-            subject: `${subject}`, // Subject line
-            text: '', // plain text body
-            html: `${htmlBody}` // html body
-        });
-
-        console.log(`Message semt: ${info.messageId}`);
+        try {
+            let info = await transporter.sendMail({
+                from: `"${fromName}" <${from}>`, // sender address
+                to: `${to}`, // list of receivers
+                subject: `${subject}`, // Subject line
+                text: '', // plain text body
+                html: `${htmlBody}` // html body
+            });
+            console.log(`Message semt: ${info.messageId}`);
+        } catch (error) {
+            Logger.error(`${error.detail || error.message}`);
+            throw new InternalServerErrorException(ResponseMessages.ERROR);
+        }
     }
 
     async sendEmailUsingSendgrid(from: string, to: string, fromName: string, subject: string, body: string, htmlBody: string): Promise<void> {

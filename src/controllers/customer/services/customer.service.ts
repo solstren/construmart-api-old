@@ -15,7 +15,7 @@ import { User, UserType } from '../../../entities/user.entity';
 import * as bcrypt from "bcrypt";
 import { v4 as uuidv4 } from 'uuid';
 import { Request } from 'express';
-import { EncryptedCode, EncryptionPurpose } from '../../../entities/encrypted-code.entity';
+import { EncryptedCode, EncryptionCodePurpose } from '../../../entities/encrypted-code.entity';
 import { EncryptedCodeRepository } from '../../../controllers/user/repository/encrypted-code.repository';
 import { getManager } from 'typeorm'
 
@@ -30,20 +30,27 @@ export class CustomerService {
     ) { }
 
     async createCustomer(request: CreateCustomerRequest): Promise<BaseResponse> {
-        let user = null;
+        let user: User = null;
         try {
-            user = await this._userRepository.findOne({ where: { email: request.email } });
+            user = await this._userRepository.findOne({ where: { email: request.email, userType: UserType.CUSTOMER } });
         } catch (error) {
             Logger.error(`ERROR_CustomerService.verifyCustomer: Error fetching user ${error}`);
             throw new InternalServerErrorException(ResponseMessages.ERROR);
         }
 
-        if (!user || !user.isActive) {
+        if (user && user.isActive) {
             throw new UnprocessableEntityException("Email has been taken");
         }
+        if (user && !user.isActive) {
+            return this._userService.ResendOtp({
+                email: user.email,
+                role: UserType.CUSTOMER,
+                purpose: EncryptionCodePurpose.CUSTOMER_ONBOARDING
+            });
+        }
         // Generate otp and assign it to user
-        let otp = AppUtils.GenerateOtp()
-        const encryptedCode = await this._userService.generateOtp(request.email, otp, EncryptionPurpose.CUSTOMER_ONBOARDING);
+        let otp = AppUtils.GenerateOtp();
+        const encryptedCode = await this._userService.generateEncryptedCode(request.email, otp, EncryptionCodePurpose.CUSTOMER_ONBOARDING, UserType.CUSTOMER);
         // this._encryptedCodeRepo.save(encryptedCode);
 
         user = new User();
@@ -69,16 +76,17 @@ export class CustomerService {
                 // ...
             });
         } catch (error) {
-            console.log(`Error while creating customer: ${error}`);
+            Logger.error(`Error while creating customer: ${error.detail || error.message}`);
+            throw new InternalServerErrorException(ResponseMessages.ERROR);
         }
 
         //send activation link to email
         let from = AppConstants.DOCUMENT_NAME;
         let to = user.email;
         let FromName = "Construmart";
-        let subject = "Your Account Registration";
-        let htmlbody = `<h4>Please use the one time password <b>${otp}</b> to activate your account</h4>`;
-        await this._notificationService.sendEmailUsingNodeMailer(from, to, FromName, subject, null, htmlbody);
+        let subject = "Account Registration";
+        let htmlbody = `<h4>Your one time password  is <b>${otp}</b>`;
+        await this._notificationService.sendEmailUsingSendgrid(from, to, FromName, subject, null, htmlbody);
         return {
             status: true,
             message: 'Please complete your registration using the one time password sent to your email',
@@ -88,7 +96,7 @@ export class CustomerService {
 
     async verifyCustomer(request: VerifyCustomerRequest): Promise<BaseResponse> {
         //fetch user by email
-        let user = null;
+        let user: User = null;
         try {
             user = await this._userRepository.findOne({ where: { email: request.email } });
         } catch (error) {
@@ -100,7 +108,7 @@ export class CustomerService {
             throw new UnprocessableEntityException("Invalid user account");
         }
         //fetch saved encrypted otp
-        let savedEncryptedCode = null;
+        let savedEncryptedCode: EncryptedCode = null;
         try {
             savedEncryptedCode = await this._encryptedCodeRepo.findOne({ where: { user: user } });
         } catch (error) {

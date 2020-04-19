@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsDefined, IsMobilePhone, IsPhoneNumber, IsEmail } from 'class-validator';
+import { IsNotEmpty, IsDefined, IsMobilePhone, IsPhoneNumber, IsEmail, Length } from 'class-validator';
 import { ApiModelProperty } from '@nestjs/swagger';
 export class CreateCustomerRequest {
     @ApiModelProperty({ type: String, required: true, nullable: false })
@@ -20,6 +20,7 @@ export class CreateCustomerRequest {
     @ApiModelProperty({ required: true, type: String })
     @IsDefined()
     @IsNotEmpty()
+    @Length(11, 11)
     @IsPhoneNumber("NG", { message: "invalid phone number" })
     readonly phoneNumber: string;
 

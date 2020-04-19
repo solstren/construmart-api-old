@@ -5,7 +5,6 @@ import { EncryptedCode } from './encrypted-code.entity';
 
 @Entity('user')
 export class User extends BaseEntity {
-    @Index({ unique: true })
     @Column({ type: 'varchar', nullable: false })
     email: string;
 

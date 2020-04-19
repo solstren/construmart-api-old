@@ -1,8 +1,9 @@
-import { User, UserType } from './../user.entity';
 import { MigrationInterface, QueryRunner } from "typeorm";
+import { User, UserType } from './../user.entity';
 import * as bcrypt from "bcrypt";
 
-export class seedAdmin1587212173436 implements MigrationInterface {
+export class seedAdmin1587337931043 implements MigrationInterface {
+    name = 'seedAdmin1587337931043'
 
     public async up(queryRunner: QueryRunner): Promise<any> {
         var admin = new User();

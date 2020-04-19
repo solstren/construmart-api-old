@@ -1,3 +1,4 @@
+import { CoreModule } from './../../core/core.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserRepository } from './repository/user.repository';
 import { EncryptedCodeRepository } from './repository/encrypted-code.repository';
@@ -12,6 +13,7 @@ dotenv.config({ debug: true });
     controllers: [UserController],
     providers: [UserService],
     imports: [
+        CoreModule,
         JwtModule.register({
             secret: process.env.JWT_KEY,
             signOptions: {
