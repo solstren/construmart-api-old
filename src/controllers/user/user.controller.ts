@@ -49,6 +49,6 @@ export class UserController {
     })
     @Post('/resend-otp')
     async resendOtp(@Body() request: ResendOtpRequest): Promise<BaseResponse> {
-        return await this._userService.ResendOtp(request);
+        return await this._userService.resendOtp(request);
     }
 }

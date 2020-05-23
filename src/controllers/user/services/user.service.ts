@@ -10,10 +10,11 @@ import { LoginRequest } from './../../../models/request-dto/login-request.dto';
 import { BaseResponse } from './../../../models/response-dto/base-response';
 import { UserRepository } from './../repository/user.repository';
 import { InjectRepository } from "@nestjs/typeorm";
-import { Injectable, UnauthorizedException, UnprocessableEntityException, InternalServerErrorException, Logger, NotFoundException } from "@nestjs/common";
+import { Injectable, UnauthorizedException, UnprocessableEntityException, InternalServerErrorException, Logger, NotFoundException, NotImplementedException } from "@nestjs/common";
 import * as bcrypt from "bcrypt";
 import { JwtService } from '@nestjs/jwt';
 import { EncryptedCode, EncryptionCodePurpose } from '../../../entities/encrypted-code.entity';
+import { ChangePasswordRequest } from '../../../models/request-dto/change-password-request.dto';
 
 @Injectable()
 export class UserService {
@@ -44,7 +45,7 @@ export class UserService {
         if (!isEqual) {
             throw new UnauthorizedException('Invalid login credentials')
         }
-        const payload = { sub: user.id, email: user.email };
+        const payload = { sub: user.id, email: user.email, role: user.userType };
         var token = null;
         try {
             token = this._jwtService.sign(payload);
@@ -101,7 +102,7 @@ export class UserService {
         return encryptedCode;
     }
 
-    async VerifyOtp(savedEncryptedCode: EncryptedCode, otp: string): Promise<void> {
+    async verifyOtp(savedEncryptedCode: EncryptedCode, otp: string): Promise<void> {
         if (savedEncryptedCode == null) {
             throw new UnprocessableEntityException("Invalid Otp");
         }
@@ -122,7 +123,7 @@ export class UserService {
         }
     }
 
-    async ResendOtp(request: ResendOtpRequest): Promise<BaseResponse> {
+    async resendOtp(request: ResendOtpRequest): Promise<BaseResponse> {
         let user: User = null;
         try {
             user = await this._userRepository.findOne({ where: { email: request.email, userType: request.role } });
@@ -158,5 +159,9 @@ export class UserService {
             message: 'Please complete your registration using the one time password sent to your email',
             body: null
         };
+    }
+
+    async changePassword(request: ChangePasswordRequest): Promise<BaseResponse> {
+        throw new NotImplementedException();
     }
 }

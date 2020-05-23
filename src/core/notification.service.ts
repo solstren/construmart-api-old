@@ -7,10 +7,6 @@ import * as sgMail from '@sendgrid/mail';
 
 @Injectable()
 export class NotificationService {
-    /**construmart@email.com
-     *F6D7DB1E02D1B05E03535810B5470AAFD407
-     *D757C3799E035FF1FC9639ED7DCA68078777
-     */
     constructor() { }
 
     async sendEmailUsingNodeMailer(from: string, to: string, fromName: string, subject: string, body: string, htmlBody: string): Promise<void> {

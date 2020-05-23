@@ -42,7 +42,7 @@ export class CustomerService {
             throw new UnprocessableEntityException("Email has been taken");
         }
         if (user && !user.isActive) {
-            return this._userService.ResendOtp({
+            return this._userService.resendOtp({
                 email: user.email,
                 role: UserType.CUSTOMER,
                 purpose: EncryptionCodePurpose.CUSTOMER_ONBOARDING
@@ -115,7 +115,7 @@ export class CustomerService {
             Logger.error(`ERROR_CustomerService.verifyCustomer: Error fetching encryption code ${error}`);
             throw new InternalServerErrorException(ResponseMessages.ERROR);
         }
-        await this._userService.VerifyOtp(savedEncryptedCode, request.otp);
+        await this._userService.verifyOtp(savedEncryptedCode, request.otp);
         user.isActive = true;
         user.isEmailConfirmed = true;
 
