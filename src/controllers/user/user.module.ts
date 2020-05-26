@@ -1,3 +1,4 @@
+import { JwtStrategy } from './services/jwt.strategy';
 import { CoreModule } from './../../core/core.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserRepository } from './repository/user.repository';
@@ -7,13 +8,19 @@ import { UserService } from './services/user.service';
 import { JwtModule } from '@nestjs/jwt';
 import { UserController } from './user.controller';
 import * as dotenv from 'dotenv';
+import { PassportModule } from '@nestjs/passport';
 dotenv.config({ debug: true });
 
 @Module({
     controllers: [UserController],
-    providers: [UserService],
+    providers: [UserService, JwtStrategy],
     imports: [
         CoreModule,
+        PassportModule.register({
+            defaultStrategy: 'jwt',
+            session: false,
+            property: 'user'
+        }),
         JwtModule.register({
             secret: process.env.JWT_KEY,
             signOptions: {

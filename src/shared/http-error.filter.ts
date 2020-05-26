@@ -31,7 +31,7 @@ export class HttpErrorFilter implements ExceptionFilter {
                 errorMsg = 'Failed to update data. Please try again';
                 break;
             case HttpStatus.UNAUTHORIZED:
-                errorMsg = 'Invalid user credentials. Please provide valid credentials';
+                errorMsg = 'User unauthorised. Please login.';
                 break;
             case HttpStatus.NOT_FOUND:
                 errorMsg = 'Entity does not exist';

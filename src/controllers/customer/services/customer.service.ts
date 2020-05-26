@@ -42,7 +42,7 @@ export class CustomerService {
             throw new UnprocessableEntityException("Email has been taken");
         }
         if (user && !user.isActive) {
-            return this._userService.ResendOtp({
+            return this._userService.resendOtp({
                 email: user.email,
                 role: UserType.CUSTOMER,
                 purpose: EncryptionCodePurpose.CUSTOMER_ONBOARDING
@@ -86,7 +86,7 @@ export class CustomerService {
         let FromName = "Construmart";
         let subject = "Account Registration";
         let htmlbody = `<h4>Your one time password  is <b>${otp}</b>`;
-        await this._notificationService.sendEmailUsingSendgrid(from, to, FromName, subject, null, htmlbody);
+        await this._notificationService.sendEmailUsingNodeMailer(from, to, FromName, subject, null, htmlbody);
         return {
             status: true,
             message: 'Please complete your registration using the one time password sent to your email',
@@ -115,7 +115,7 @@ export class CustomerService {
             Logger.error(`ERROR_CustomerService.verifyCustomer: Error fetching encryption code ${error}`);
             throw new InternalServerErrorException(ResponseMessages.ERROR);
         }
-        await this._userService.VerifyOtp(savedEncryptedCode, request.otp);
+        await this._userService.verifyOtp(savedEncryptedCode, request.otp);
         user.isActive = true;
         user.isEmailConfirmed = true;
 

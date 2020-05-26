@@ -1,3 +1,5 @@
+import { JwtAuthGuard } from './shared/jwt.auth.guard';
+import { RolesGuard } from './shared/roles.auth.guard';
 import { TagModule } from './controllers/tag/tag.module';
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
@@ -11,6 +13,7 @@ import { InventoryModule } from './controllers/inventory/inventory.module';
 import { InventoryHistoryModule } from './controllers/inventory-history/inventory-history.module';
 import { UserModule } from './controllers/user/user.module';
 import { CustomerModule } from './controllers/customer/customer.module';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
     imports: [
@@ -25,6 +28,16 @@ import { CustomerModule } from './controllers/customer/customer.module';
         CustomerModule
     ],
     controllers: [AppController],
-    providers: [AppService]
+    providers: [
+        AppService,
+        // {
+        //     provide: APP_GUARD,
+        //     useClass: JwtAuthGuard
+        // },
+        // {
+        //     provide: APP_GUARD,
+        //     useClass: RolesGuard
+        // }
+    ],
 })
 export class AppModule { }

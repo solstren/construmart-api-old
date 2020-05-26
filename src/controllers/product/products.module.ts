@@ -1,3 +1,4 @@
+import { PassportModule } from '@nestjs/passport';
 import { Module } from '@nestjs/common';
 import { ProductsController } from './products.controller';
 import { ProductsService } from './services/products.service';
