@@ -109,6 +109,6 @@ export class UserController {
     })
     @Post('/reset-password/complete')
     async completeResetPassword(@Body() dto: CompleteResetPasswordRequestDto): Promise<BaseResponse> {
-        return await this._userService.initiateResetPassword(dto);
+        return await this._userService.completeResetPassword(dto);
     }
 }
