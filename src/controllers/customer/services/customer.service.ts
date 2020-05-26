@@ -79,14 +79,7 @@ export class CustomerService {
             Logger.error(`Error while creating customer: ${error.detail || error.message}`);
             throw new InternalServerErrorException(ResponseMessages.ERROR);
         }
-
-        //send activation link to email
-        let from = AppConstants.DEFAULT_EMAIL_FROM;
-        let to = user.email;
-        let FromName = "Construmart";
-        let subject = "Account Registration";
-        let htmlbody = `<h4>Your one time password  is <b>${otp}</b>`;
-        await this._notificationService.sendEmailUsingNodeMailer(from, to, FromName, subject, null, htmlbody);
+        this._userService.sendOtpToEmail(user.email, otp, EncryptionCodePurpose.CUSTOMER_ONBOARDING);
         return {
             status: true,
             message: 'Please complete your registration using the one time password sent to your email',
