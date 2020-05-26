@@ -81,7 +81,7 @@ export class CustomerService {
         }
 
         //send activation link to email
-        let from = AppConstants.DOCUMENT_NAME;
+        let from = AppConstants.DEFAULT_EMAIL_FROM;
         let to = user.email;
         let FromName = "Construmart";
         let subject = "Account Registration";
@@ -98,7 +98,7 @@ export class CustomerService {
         //fetch user by email
         let user: User = null;
         try {
-            user = await this._userRepository.findOne({ where: { email: request.email } });
+            user = await this._userRepository.findOne({ where: { email: request.email, isActive: false } });
         } catch (error) {
             Logger.error(`ERROR_CustomerService.verifyCustomer: Error fetching user ${error}`);
             throw new InternalServerErrorException(ResponseMessages.ERROR);
@@ -107,33 +107,17 @@ export class CustomerService {
         if (user == null) {
             throw new UnprocessableEntityException("Invalid user account");
         }
-        //fetch saved encrypted otp
-        let savedEncryptedCode: EncryptedCode = null;
-        try {
-            savedEncryptedCode = await this._encryptedCodeRepo.findOne({ where: { user: user } });
-        } catch (error) {
-            Logger.error(`ERROR_CustomerService.verifyCustomer: Error fetching encryption code ${error}`);
-            throw new InternalServerErrorException(ResponseMessages.ERROR);
-        }
-        await this._userService.verifyOtp(savedEncryptedCode, request.otp);
         user.isActive = true;
         user.isEmailConfirmed = true;
-
         try {
-            await getManager().transaction(async transactionalEntityManager => {
-                await transactionalEntityManager.save(savedEncryptedCode);
-                await transactionalEntityManager.save(user);
-                // ...
-            });
+            await this._userRepository.save(user);
         } catch (error) {
-            Logger.error(`ERROR_CustomerService.verifyCustomer: Error while verifying customer otp: ${error}`);
-            throw new HttpException(ResponseMessages.ERROR, HttpStatus.NOT_MODIFIED);
+            throw new InternalServerErrorException(ResponseMessages.ERROR);
         }
-
         //return response
         return {
             body: null,
-            message: null,
+            message: "Registration is complete. Proceed to login",
             status: true
         }
     }

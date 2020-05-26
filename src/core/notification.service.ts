@@ -16,7 +16,7 @@ export class NotificationService {
             port: 465,
             secure: true, // true for 465, false for other ports
             auth: {
-                user: AppConstants.DOCUMENT_NAME, // generated ethereal user
+                user: AppConstants.DEFAULT_EMAIL_FROM, // generated ethereal user
                 pass: AppConstants.SOMETHING // generated ethereal password
             }
         });
