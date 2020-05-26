@@ -89,7 +89,6 @@ export class UserController {
     @ApiOkResponse({
         description: AppConstants.SWAGGER_200_DESCRIPTION
     })
-    @UseGuards(JwtAuthGuard)
     // @Roles(UserType.ADMIN)
     @Post('/reset-password/initiate')
     async initiateResetPassword(@Body() dto: InitiateResetPasswordRequestDto): Promise<BaseResponse> {
@@ -107,7 +106,6 @@ export class UserController {
     @ApiOkResponse({
         description: AppConstants.SWAGGER_200_DESCRIPTION
     })
-    @UseGuards(JwtAuthGuard)
     // @Roles(UserType.ADMIN)
     @Post('/reset-password/complete')
     async completeResetPassword(@Body() dto: InitiateResetPasswordRequestDto): Promise<BaseResponse> {
