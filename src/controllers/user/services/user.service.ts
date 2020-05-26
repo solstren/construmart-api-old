@@ -1,3 +1,5 @@
+import { CompleteResetPasswordRequestDto } from './../../../models/request-dto/complete-reset-password-request.dto';
+import { InitiateResetPasswordRequestDto } from './../../../models/request-dto/initiate-reset-password-request.dto';
 import { AuthUserDto } from './../../../models/request-dto/auth-user.dto';
 import { NotificationService } from './../../../core/notification.service';
 import { AppConstants } from './../../../utils/app-constants';
@@ -103,7 +105,14 @@ export class UserService {
         return encryptedCode;
     }
 
-    async verifyOtp(savedEncryptedCode: EncryptedCode, otp: string): Promise<void> {
+    async verifyOtp(user: User, otp: string): Promise<void> {
+        let savedEncryptedCode: EncryptedCode = null;
+        try {
+            savedEncryptedCode = await this._encryptedCodeRepo.findOne({ where: { user: user } });
+        } catch (error) {
+            Logger.error(`ERROR_CustomerService.verifyCustomer: Error fetching encryption code ${error}`);
+            throw new InternalServerErrorException(ResponseMessages.ERROR);
+        }
         if (savedEncryptedCode == null) {
             throw new UnprocessableEntityException("Invalid Otp");
         }
@@ -116,11 +125,17 @@ export class UserService {
         if (!isEqual) {
             throw new UnprocessableEntityException('invalid Otp');
         }
-        if (isEqual && (expiryDate.getTime() < currentDate.getTime())) {
+        if (expiryDate.getTime() < currentDate.getTime()) {
             throw new UnprocessableEntityException('OTP has expired. Please click on resend to generate a new OTP');
         }
-        if (isEqual && savedEncryptedCode.purpose !== EncryptionCodePurpose.CUSTOMER_ONBOARDING) {
+        if (savedEncryptedCode.purpose !== EncryptionCodePurpose.CUSTOMER_ONBOARDING) {
             throw new UnprocessableEntityException('invalid OTP');
+        }
+        savedEncryptedCode.isUsed = true;
+        try {
+            await this._encryptedCodeRepo.save(savedEncryptedCode);
+        } catch (error) {
+            throw new InternalServerErrorException(ResponseMessages.ERROR);
         }
     }
 
@@ -139,12 +154,21 @@ export class UserService {
         var encryptedCode = await this.generateEncryptedCode(request.email, otp, request.purpose, request.role);
         this._encryptedCodeRepo.save(encryptedCode);
         //send activation link to email
-        let from = AppConstants.DOCUMENT_NAME;
-        let to = user.email;
+        await this.sendOtpToEmail(request.email, otp, request.purpose);
+        return {
+            status: true,
+            message: 'Please complete your registration using the one time password sent to your email',
+            body: null
+        };
+    }
+
+    async sendOtpToEmail(email: string, otp: string, otpPurpose: EncryptionCodePurpose): Promise<void> {
+        let from = AppConstants.DEFAULT_EMAIL_FROM;
+        let to = email;
         let FromName = "Construmart";
         let subject = null;
         let htmlbody = `<h4>Your one time password  is <b>${otp}</b>`;
-        switch (request.purpose) {
+        switch (otpPurpose) {
             case EncryptionCodePurpose.CUSTOMER_ONBOARDING:
                 subject = 'Account Registration';
                 break;
@@ -154,12 +178,11 @@ export class UserService {
                 subject = 'Your One Time Password'
                 break;
         }
-        await this._notificationService.sendEmailUsingSendgrid(from, to, FromName, subject, null, htmlbody);
-        return {
-            status: true,
-            message: 'Please complete your registration using the one time password sent to your email',
-            body: null
-        };
+        try {
+            await this._notificationService.sendEmailUsingSendgrid(from, to, FromName, subject, null, htmlbody);
+        } catch (error) {
+            throw new InternalServerErrorException(ResponseMessages.ERROR)
+        }
     }
 
     async changePassword(authUser: AuthUserDto, request: ChangePasswordRequestDto): Promise<BaseResponse> {
@@ -180,6 +203,58 @@ export class UserService {
         const result: User = await this._userRepository.save(user);
         if (!result) {
             throw new HttpException(ResponseMessages.ERROR, HttpStatus.NOT_MODIFIED);
+        }
+        return {
+            status: true,
+            message: ResponseMessages.CHANGE_PASSWORD_SUCCESS,
+            body: null
+        };
+    }
+
+    async initiateResetPassword(request: InitiateResetPasswordRequestDto) {
+        let user: User = null;
+        try {
+            user = await this._userRepository.findOne({ where: { email: request.email, userType: request.role } });
+        } catch (error) {
+            Logger.error(error);
+            throw new InternalServerErrorException(ResponseMessages.ERROR);
+        }
+        if (!user) {
+            throw new UnprocessableEntityException(ResponseMessages.CHANGE_PASSWORD_FAILED);
+        }
+        let otp = AppUtils.GenerateOtp();
+        let encryptedCode = await this.generateEncryptedCode(request.email, otp, EncryptionCodePurpose.PASSWORD_RESET, request.role);
+        this._encryptedCodeRepo.save(encryptedCode);
+        //send activation link to email
+        await this.sendOtpToEmail(request.email, otp, EncryptionCodePurpose.PASSWORD_RESET);
+        return {
+            status: true,
+            message: 'Please use the OTP sent to the email provided to reset ',
+            body: null
+        };
+    }
+
+    async completeResetPassword(request: CompleteResetPasswordRequestDto) {
+        let user: User = null;
+        try {
+            user = await this._userRepository.findOne({ where: { email: request.email, userType: request.role } });
+        } catch (error) {
+            Logger.error(error);
+            throw new InternalServerErrorException(ResponseMessages.ERROR);
+        }
+        let encryptedCode = null;
+        try {
+            encryptedCode = await this._encryptedCodeRepo.findOne({ where: { user: user } });
+        } catch (error) {
+            Logger.error(error);
+            throw new InternalServerErrorException(ResponseMessages.ERROR);
+        }
+        await this.verifyOtp(encryptedCode, request.otp);
+        user.password = await bcrypt.hash(request.newPassword, await bcrypt.genSalt());
+        try {
+            await this._userRepository.save(user);
+        } catch (error) {
+            throw new InternalServerErrorException(ResponseMessages.ERROR);
         }
         return {
             status: true,

@@ -1,3 +1,4 @@
+import { InitiateResetPasswordRequestDto } from './../../models/request-dto/initiate-reset-password-request.dto';
 import { ChangePasswordRequestDto } from './../../models/request-dto/change-password-request.dto';
 import { UserType } from './../../entities/user.entity';
 import { RolesGuard } from './../../shared/roles.auth.guard';
@@ -75,5 +76,41 @@ export class UserController {
     @Post('/change-password')
     async changePassword(@Body() dto: ChangePasswordRequestDto, @Request() request: any): Promise<BaseResponse> {
         return await this._userService.changePassword(request.user, dto);
+    }
+
+    @ApiUseTags(AppConstants.SWAGGER_USER_TAG)
+    @ApiUnprocessableEntityResponse({
+        type: BaseResponse,
+        description: AppConstants.SWAGGER_422_DESCRIPTION
+    })
+    @ApiInternalServerErrorResponse({
+        description: AppConstants.SWAGGER_500_DESCRIPTION
+    })
+    @ApiOkResponse({
+        description: AppConstants.SWAGGER_200_DESCRIPTION
+    })
+    @UseGuards(JwtAuthGuard)
+    // @Roles(UserType.ADMIN)
+    @Post('/reset-password/initiate')
+    async initiateResetPassword(@Body() dto: InitiateResetPasswordRequestDto): Promise<BaseResponse> {
+        return await this._userService.initiateResetPassword(dto);
+    }
+
+    @ApiUseTags(AppConstants.SWAGGER_USER_TAG)
+    @ApiUnprocessableEntityResponse({
+        type: BaseResponse,
+        description: AppConstants.SWAGGER_422_DESCRIPTION
+    })
+    @ApiInternalServerErrorResponse({
+        description: AppConstants.SWAGGER_500_DESCRIPTION
+    })
+    @ApiOkResponse({
+        description: AppConstants.SWAGGER_200_DESCRIPTION
+    })
+    @UseGuards(JwtAuthGuard)
+    // @Roles(UserType.ADMIN)
+    @Post('/reset-password/complete')
+    async completeResetPassword(@Body() dto: InitiateResetPasswordRequestDto): Promise<BaseResponse> {
+        return await this._userService.initiateResetPassword(dto);
     }
 }

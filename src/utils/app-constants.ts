@@ -2,7 +2,7 @@ export class AppConstants {
     // swagger constants
     static SWAGGER_URI = "/swagger/index.html";
     static SWAGGER_DOC_TITLE = 'Construmart API';
-    static DOCUMENT_NAME = 'gabbygabbylexy@gmail.com'
+    static DEFAULT_EMAIL_FROM = 'gabbygabbylexy@gmail.com'
     static SWAGGER_DOC_DESCRIPTION = 'Documentation for Construmart web service';
     static SWAGGER_API_VERSION = '1.0';
     static SWAGGER_ADMIN_TAG = 'Construmart Admin';
