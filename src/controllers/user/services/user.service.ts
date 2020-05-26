@@ -1,6 +1,7 @@
+import { AuthUserDto } from './../../../models/request-dto/auth-user.dto';
 import { NotificationService } from './../../../core/notification.service';
 import { AppConstants } from './../../../utils/app-constants';
-import { ResendOtpRequest } from './../../../models/request-dto/resend-otp-request.dto';
+import { ResendOtpRequestDto } from './../../../models/request-dto/resend-otp-request.dto';
 import { stringLiteral } from '@babel/types';
 import { ResponseMessages } from './../../../utils/response-messages';
 import { EncryptedCodeRepository } from './../repository/encrypted-code.repository';
@@ -10,11 +11,11 @@ import { LoginRequest } from './../../../models/request-dto/login-request.dto';
 import { BaseResponse } from './../../../models/response-dto/base-response';
 import { UserRepository } from './../repository/user.repository';
 import { InjectRepository } from "@nestjs/typeorm";
-import { Injectable, UnauthorizedException, UnprocessableEntityException, InternalServerErrorException, Logger, NotFoundException, NotImplementedException } from "@nestjs/common";
+import { Injectable, UnauthorizedException, UnprocessableEntityException, InternalServerErrorException, Logger, NotFoundException, NotImplementedException, HttpException, HttpStatus } from "@nestjs/common";
 import * as bcrypt from "bcrypt";
 import { JwtService } from '@nestjs/jwt';
 import { EncryptedCode, EncryptionCodePurpose } from '../../../entities/encrypted-code.entity';
-import { ChangePasswordRequest } from '../../../models/request-dto/change-password-request.dto';
+import { ChangePasswordRequestDto } from '../../../models/request-dto/change-password-request.dto';
 
 @Injectable()
 export class UserService {
@@ -123,7 +124,7 @@ export class UserService {
         }
     }
 
-    async resendOtp(request: ResendOtpRequest): Promise<BaseResponse> {
+    async resendOtp(request: ResendOtpRequestDto): Promise<BaseResponse> {
         let user: User = null;
         try {
             user = await this._userRepository.findOne({ where: { email: request.email, userType: request.role } });
@@ -161,7 +162,29 @@ export class UserService {
         };
     }
 
-    async changePassword(request: ChangePasswordRequest): Promise<BaseResponse> {
-        throw new NotImplementedException();
+    async changePassword(authUser: AuthUserDto, request: ChangePasswordRequestDto): Promise<BaseResponse> {
+        let user: User = null;
+        try {
+            user = await this._userRepository.findOne({ where: { email: authUser.email, userType: authUser.role } });
+        } catch (error) {
+            Logger.error(error);
+            throw new InternalServerErrorException(ResponseMessages.ERROR);
+        }
+        if (!user) {
+            throw new UnprocessableEntityException(ResponseMessages.CHANGE_PASSWORD_FAILED);
+        }
+        if (! await bcrypt.compare(request.oldPassword, user.password)) {
+            throw new UnprocessableEntityException(ResponseMessages.OLD_PASSWORD_MISMATCH);
+        }
+        user.password = await bcrypt.hash(request.newPassword, await bcrypt.genSalt());
+        const result: User = await this._userRepository.save(user);
+        if (!result) {
+            throw new HttpException(ResponseMessages.ERROR, HttpStatus.NOT_MODIFIED);
+        }
+        return {
+            status: true,
+            message: ResponseMessages.CHANGE_PASSWORD_SUCCESS,
+            body: null
+        };
     }
 }

@@ -23,7 +23,7 @@ async function bootstrap() {
         .setSchemes('https', 'http')
         .build();
     const swaggerDoc = SwaggerModule.createDocument(app, swaggerConfig);
-    SwaggerModule.setup('', app, swaggerDoc);
+    SwaggerModule.setup(AppConstants.SWAGGER_URI, app, swaggerDoc);
 
     app.enableCors();
     app.use(compression())

@@ -12,4 +12,7 @@ export class ResponseMessages {
     static PRODUCT_DOES_NOT_EXIST = 'That Product does not exist';
     static UPDATE_INVENTORY_SUCCESS = 'Inventory has been updated successfully';
     static UPDATE_INVENTORY_HISTORY_FAILURE = 'Failed to update inventory history';
+    static CHANGE_PASSWORD_FAILED = 'Failed to change password, please try again';
+    static OLD_PASSWORD_MISMATCH = 'Old password is invalid.';
+    static CHANGE_PASSWORD_SUCCESS = 'Password changed successfully';
 }

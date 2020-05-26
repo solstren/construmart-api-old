@@ -86,7 +86,7 @@ export class CustomerService {
         let FromName = "Construmart";
         let subject = "Account Registration";
         let htmlbody = `<h4>Your one time password  is <b>${otp}</b>`;
-        await this._notificationService.sendEmailUsingSendgrid(from, to, FromName, subject, null, htmlbody);
+        await this._notificationService.sendEmailUsingNodeMailer(from, to, FromName, subject, null, htmlbody);
         return {
             status: true,
             message: 'Please complete your registration using the one time password sent to your email',

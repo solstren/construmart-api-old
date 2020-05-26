@@ -1,3 +1,8 @@
+import { UserType } from './../../entities/user.entity';
+import { RolesGuard } from './../../shared/roles.auth.guard';
+import { Roles } from './../../shared/roles.decorator';
+import { JwtAuthGuard } from '../../shared/jwt.auth.guard';
+import { AuthGuard } from '@nestjs/passport';
 import {
     Controller,
     UsePipes,
@@ -13,7 +18,9 @@ import {
     HttpStatus,
     Post,
     Logger,
-    Query
+    Query,
+    UseGuards,
+    Request
 } from '@nestjs/common';
 import { AppValidationPipe } from '../../shared/app-validation.pipe';
 import { HttpErrorFilter } from '../../shared/http-error.filter';
@@ -61,7 +68,7 @@ export class ProductsController {
     @Get('/:id')
     async getProductById(
         @Param('id', ParseIntPipe)
-        id: number
+        id: any
     ): Promise<BaseResponse> {
         return await this._productService.getProductById(id);
     }

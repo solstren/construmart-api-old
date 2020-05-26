@@ -3,7 +3,7 @@ import { ApiModelProperty } from '@nestjs/swagger';
 import { UserType } from '../../entities/user.entity';
 import { EncryptionCodePurpose } from '../../entities/encrypted-code.entity';
 
-export class ResendOtpRequest {
+export class ResendOtpRequestDto {
     @ApiModelProperty({ type: String, required: true, nullable: false })
     @IsDefined()
     @IsNotEmpty()
