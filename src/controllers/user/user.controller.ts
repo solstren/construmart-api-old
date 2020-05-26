@@ -1,3 +1,4 @@
+import { CompleteResetPasswordRequestDto } from './../../models/request-dto/complete-reset-password-request.dto';
 import { InitiateResetPasswordRequestDto } from './../../models/request-dto/initiate-reset-password-request.dto';
 import { ChangePasswordRequestDto } from './../../models/request-dto/change-password-request.dto';
 import { UserType } from './../../entities/user.entity';
@@ -106,9 +107,8 @@ export class UserController {
     @ApiOkResponse({
         description: AppConstants.SWAGGER_200_DESCRIPTION
     })
-    // @Roles(UserType.ADMIN)
     @Post('/reset-password/complete')
-    async completeResetPassword(@Body() dto: InitiateResetPasswordRequestDto): Promise<BaseResponse> {
+    async completeResetPassword(@Body() dto: CompleteResetPasswordRequestDto): Promise<BaseResponse> {
         return await this._userService.initiateResetPassword(dto);
     }
 }
