@@ -100,6 +100,7 @@ export class CustomerService {
         if (user == null) {
             throw new UnprocessableEntityException("Invalid user account");
         }
+        await this._userService.verifyOtp(user, request.otp, EncryptionCodePurpose.CUSTOMER_ONBOARDING);
         user.isActive = true;
         user.isEmailConfirmed = true;
         try {

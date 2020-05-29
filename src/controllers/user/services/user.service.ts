@@ -88,24 +88,26 @@ export class UserService {
                 encryptedCode.code = await bcrypt.hash(otp, await bcrypt.genSalt());
                 encryptedCode.expiry = expiry.toString();
                 encryptedCode.purpose = purpose;
+                encryptedCode.isUsed = false;
             }
             else {
                 encryptedCode = new EncryptedCode();
                 encryptedCode.code = await bcrypt.hash(otp, await bcrypt.genSalt());
                 encryptedCode.expiry = expiry.toString();
                 encryptedCode.purpose = purpose;
+                encryptedCode.isUsed = false;
             }
         } else {
             encryptedCode = new EncryptedCode();
             encryptedCode.code = await bcrypt.hash(otp, await bcrypt.genSalt());
             encryptedCode.expiry = expiry.toString();
             encryptedCode.purpose = purpose;
+            encryptedCode.isUsed = false;
         }
-
         return encryptedCode;
     }
 
-    async verifyOtp(user: User, otp: string): Promise<void> {
+    async verifyOtp(user: User, otp: string, otpPurpose: EncryptionCodePurpose): Promise<void> {
         let savedEncryptedCode: EncryptedCode = null;
         try {
             savedEncryptedCode = await this._encryptedCodeRepo.findOne({ where: { user: user } });
@@ -128,7 +130,7 @@ export class UserService {
         if (expiryDate.getTime() < currentDate.getTime()) {
             throw new UnprocessableEntityException('OTP has expired. Please click on resend to generate a new OTP');
         }
-        if (savedEncryptedCode.purpose !== EncryptionCodePurpose.CUSTOMER_ONBOARDING) {
+        if (savedEncryptedCode.purpose !== otpPurpose) {
             throw new UnprocessableEntityException('invalid OTP');
         }
         savedEncryptedCode.isUsed = true;
@@ -249,7 +251,7 @@ export class UserService {
             Logger.error(error);
             throw new InternalServerErrorException(ResponseMessages.ERROR);
         }
-        await this.verifyOtp(encryptedCode, request.otp);
+        await this.verifyOtp(encryptedCode, request.otp, EncryptionCodePurpose.PASSWORD_RESET);
         user.password = await bcrypt.hash(request.newPassword, await bcrypt.genSalt());
         try {
             await this._userRepository.save(user);
