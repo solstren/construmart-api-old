@@ -1,4 +1,3 @@
-import { EncryptionCodePurpose } from './../../../entities/encrypted-code.entity';
 import { CompleteResetPasswordRequestDto } from './../../../models/request-dto/complete-reset-password-request.dto';
 import { InitiateResetPasswordRequestDto } from './../../../models/request-dto/initiate-reset-password-request.dto';
 import { AuthUserDto } from './../../../models/request-dto/auth-user.dto';
@@ -252,7 +251,7 @@ export class UserService {
             Logger.error(error);
             throw new InternalServerErrorException(ResponseMessages.ERROR);
         }
-        await this.verifyOtp(encryptedCode, request.otp);
+        await this.verifyOtp(encryptedCode, request.otp, EncryptionCodePurpose.PASSWORD_RESET);
         user.password = await bcrypt.hash(request.newPassword, await bcrypt.genSalt());
         try {
             await this._userRepository.save(user);
