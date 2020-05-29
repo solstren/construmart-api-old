@@ -10,6 +10,8 @@ import * as dotenv from 'dotenv';
 async function bootstrap() {
     dotenv.config({ debug: true });
 
+    console.log("HOST==>", process.env.DB_HOST);
+
     const port = process.env.PORT || 3000;
     const app = await NestFactory.create(AppModule);
 

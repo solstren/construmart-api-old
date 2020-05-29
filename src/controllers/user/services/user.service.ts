@@ -89,6 +89,7 @@ export class UserService {
                 encryptedCode.expiry = expiry.toString();
                 encryptedCode.purpose = purpose;
                 encryptedCode.isUsed = false;
+                encryptedCode.user = user;
             }
             else {
                 encryptedCode = new EncryptedCode();
@@ -96,6 +97,7 @@ export class UserService {
                 encryptedCode.expiry = expiry.toString();
                 encryptedCode.purpose = purpose;
                 encryptedCode.isUsed = false;
+                encryptedCode.user = user;
             }
         } else {
             encryptedCode = new EncryptedCode();
@@ -103,6 +105,7 @@ export class UserService {
             encryptedCode.expiry = expiry.toString();
             encryptedCode.purpose = purpose;
             encryptedCode.isUsed = false;
+            encryptedCode.user = user;
         }
         return encryptedCode;
     }
