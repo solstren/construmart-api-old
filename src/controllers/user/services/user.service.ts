@@ -1,3 +1,4 @@
+import { EncryptionCodePurpose } from './../../../entities/encrypted-code.entity';
 import { CompleteResetPasswordRequestDto } from './../../../models/request-dto/complete-reset-password-request.dto';
 import { InitiateResetPasswordRequestDto } from './../../../models/request-dto/initiate-reset-password-request.dto';
 import { AuthUserDto } from './../../../models/request-dto/auth-user.dto';
@@ -88,24 +89,26 @@ export class UserService {
                 encryptedCode.code = await bcrypt.hash(otp, await bcrypt.genSalt());
                 encryptedCode.expiry = expiry.toString();
                 encryptedCode.purpose = purpose;
+                encryptedCode.isUsed = false;
             }
             else {
                 encryptedCode = new EncryptedCode();
                 encryptedCode.code = await bcrypt.hash(otp, await bcrypt.genSalt());
                 encryptedCode.expiry = expiry.toString();
                 encryptedCode.purpose = purpose;
+                encryptedCode.isUsed = false;
             }
         } else {
             encryptedCode = new EncryptedCode();
             encryptedCode.code = await bcrypt.hash(otp, await bcrypt.genSalt());
             encryptedCode.expiry = expiry.toString();
             encryptedCode.purpose = purpose;
+            encryptedCode.isUsed = false;
         }
-
         return encryptedCode;
     }
 
-    async verifyOtp(user: User, otp: string): Promise<void> {
+    async verifyOtp(user: User, otp: string, otpPurpose: EncryptionCodePurpose): Promise<void> {
         let savedEncryptedCode: EncryptedCode = null;
         try {
             savedEncryptedCode = await this._encryptedCodeRepo.findOne({ where: { user: user } });
@@ -128,7 +131,7 @@ export class UserService {
         if (expiryDate.getTime() < currentDate.getTime()) {
             throw new UnprocessableEntityException('OTP has expired. Please click on resend to generate a new OTP');
         }
-        if (savedEncryptedCode.purpose !== EncryptionCodePurpose.CUSTOMER_ONBOARDING) {
+        if (savedEncryptedCode.purpose !== otpPurpose) {
             throw new UnprocessableEntityException('invalid OTP');
         }
         savedEncryptedCode.isUsed = true;
