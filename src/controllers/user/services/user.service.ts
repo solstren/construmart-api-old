@@ -251,7 +251,7 @@ export class UserService {
             Logger.error(error);
             throw new InternalServerErrorException(ResponseMessages.ERROR);
         }
-        await this.verifyOtp(encryptedCode, request.otp, EncryptionCodePurpose.PASSWORD_RESET);
+        await this.verifyOtp(user, request.otp, EncryptionCodePurpose.PASSWORD_RESET);
         user.password = await bcrypt.hash(request.newPassword, await bcrypt.genSalt());
         try {
             await this._userRepository.save(user);
