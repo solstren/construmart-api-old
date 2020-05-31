@@ -1,3 +1,5 @@
+import { CategoriesModule } from './controllers/category/categories.module';
+import { CategoriesController } from './controllers/category/categories.controller';
 import { JwtAuthGuard } from './shared/jwt.auth.guard';
 import { RolesGuard } from './shared/roles.auth.guard';
 import { TagModule } from './controllers/tag/tag.module';
@@ -17,6 +19,7 @@ import { APP_GUARD } from '@nestjs/core';
 
 @Module({
     imports: [
+        CategoriesModule,
         TypeOrmModule.forRoot(),
         CoreModule,
         ConfigModule,
@@ -27,7 +30,9 @@ import { APP_GUARD } from '@nestjs/core';
         UserModule,
         CustomerModule
     ],
-    controllers: [AppController],
+    controllers: [
+        AppController
+    ],
     providers: [
         AppService,
         // {
