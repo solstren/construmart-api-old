@@ -40,6 +40,7 @@ import { FileUploadRequest } from '../../models/request-dto/file-upload-request'
 import { BaseResponse } from '../../models/response-dto/base-response';
 import { CategoryRequestDto } from '../../models/request-dto/category-request.dto';
 
+//categories
 @Controller(`${AppConstants.APP_BASE_URL}categories`)
 @UsePipes(AppValidationPipe)
 @UseFilters(HttpErrorFilter)
